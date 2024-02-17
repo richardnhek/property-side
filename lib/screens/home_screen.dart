@@ -15,6 +15,7 @@ import '../di/injector.dart';
 import '../utils/assets.dart';
 import '../utils/consts.dart';
 import '../utils/loading_dialog.dart';
+import 'new_chat_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -158,9 +159,23 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(
+              Icons.logout,
+              color: Colors.white,
+            ),
             onPressed: _userAuthController.logout,
           ),
+          IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ContactsPage()),
+                );
+              },
+              icon: const Icon(
+                Icons.edit,
+                color: Colors.white,
+              ))
         ],
       ),
       body: Center(
