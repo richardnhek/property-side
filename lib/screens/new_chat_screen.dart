@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 import '../core/repos/app_preferences.dart';
 import '../di/injector.dart';
@@ -20,11 +20,13 @@ class _ContactsPageState extends State<ContactsPage> {
   void initState() {
     final prefs = locator.get<AppPreferences>();
     final credentials = prefs.userCredentials;
+    StreamChatClient client = locator.get();
     userListController = StreamUserListController(
-      client: locator.get(),
+      client: client,
       filter: Filter.notEqual('id', credentials!.userInfo.id),
       limit: 20,
     );
+    userListController.doInitialLoad();
     super.initState();
   }
 
@@ -83,9 +85,11 @@ class _ContactTile extends StatefulWidget {
 class _ContactTileState extends State<_ContactTile> {
   Future<void> createChannel(BuildContext context) async {
     // final core = StreamChatCore.of(context);
+    final prefs = locator.get<AppPreferences>();
+    final credentials = prefs.userCredentials;
     final StreamChatClient client = locator.get();
     final nav = Navigator.of(context);
-    final members = ["obamakdor@gmail.com", widget.user.id];
+    final members = [credentials!.userInfo.id, widget.user.id];
     final channel =
         client.channel('messaging', extraData: {'members': members});
     await channel.watch();

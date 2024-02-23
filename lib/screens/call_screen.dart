@@ -74,6 +74,7 @@ class _CallScreenState extends State<CallScreen> {
   }
 
   void showChat(BuildContext context) {
+    print("Show Chat");
     showModalBottomSheet<dynamic>(
       context: context,
       showDragHandle: true,

@@ -10,6 +10,7 @@ import 'package:flutter_dogfooding/screens/call_screen.dart';
 import 'package:flutter_dogfooding/screens/home_screen.dart';
 import 'package:flutter_dogfooding/screens/lobby_screen.dart';
 import '../screens/login_screen.dart';
+import '../screens/new_login/new_login.dart';
 
 part 'routes.g.dart';
 
@@ -27,7 +28,7 @@ class HomeRoute extends GoRouteData {
 class LoginRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const LoginScreen();
+    return const NewLoginScreen();
   }
 }
 

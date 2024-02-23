@@ -33,7 +33,7 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>dogfooding</title>
+  <title>PropertySide</title>
   <link rel="manifest" href="manifest.json">
 
   <script>
@@ -58,5 +58,12 @@
       });
     });
   </script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("/flutter_service_worker.js");
+      });
+    }
+    </script>
 </body>
 </html>

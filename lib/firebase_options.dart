@@ -47,33 +47,41 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyB1swZGD2U9qEKV4xYKlr9KBHeysTHJ_1w',
-    appId: '1:347024607410:web:fd70974cbc1256bb8c21ab',
-    messagingSenderId: '347024607410',
-    projectId: 'stream-video-9b586',
-    authDomain: 'stream-video-9b586.firebaseapp.com',
-    storageBucket: 'stream-video-9b586.appspot.com',
+    apiKey: 'AIzaSyDb-t24nuSg6BstLEUuclcOBYvpk9w2N2Q',
+    appId: '1:264371954957:web:0cc5b9cbb2bc3d15bbfc44',
+    messagingSenderId: '264371954957',
+    projectId: 'propertyside-test',
+    authDomain: 'propertyside-test.firebaseapp.com',
+    storageBucket: 'propertyside-test.appspot.com',
   );
+  // static const FirebaseOptions web = FirebaseOptions(
+  //   apiKey: 'AIzaSyB1swZGD2U9qEKV4xYKlr9KBHeysTHJ_1w',
+  //   appId: '1:347024607410:web:fd70974cbc1256bb8c21ab',
+  //   messagingSenderId: '347024607410',
+  //   projectId: 'stream-video-9b586',
+  //   authDomain: 'stream-video-9b586.firebaseapp.com',
+  //   storageBucket: 'stream-video-9b586.appspot.com',
+  // );
+
+  // static const FirebaseOptions android = FirebaseOptions(
+  //   apiKey: 'AIzaSyD4FMyTdDv97hJia6YiV1NMgTdJhbnEwQE',
+  //   appId: '1:347024607410:android:09387231c1b256b68c21ab',
+  //   messagingSenderId: '248009810755',
+  //   projectId: 'stream-video-9b586',
+  //   storageBucket: 'stream-video-9b586.appspot.com',
+  // );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyD4FMyTdDv97hJia6YiV1NMgTdJhbnEwQE',
-    appId: '1:347024607410:android:09387231c1b256b68c21ab',
-    messagingSenderId: '248009810755',
-    projectId: 'stream-video-9b586',
-    storageBucket: 'stream-video-9b586.appspot.com',
+    apiKey:
+        'AIzaSyAAsFzCi9L-E9CuULP64MO_FVd8mo0J8S4', // From "api_key" -> "current_key"
+    appId:
+        '1:264371954957:android:436b2b784d5a5c56bbfc44', // From "client" -> "client_info" -> "mobilesdk_app_id"
+    messagingSenderId:
+        '264371954957', // From "project_info" -> "project_number"
+    projectId: 'propertyside-test', // From "project_info" -> "project_id"
+    storageBucket:
+        'propertyside-test.appspot.com', // From "project_info" -> "storage_bucket"
   );
-
-  //   static const FirebaseOptions android = FirebaseOptions(
-  //   apiKey:
-  //       'AIzaSyAAsFzCi9L-E9CuULP64MO_FVd8mo0J8S4', // From "api_key" -> "current_key"
-  //   appId:
-  //       '1:264371954957:android:436b2b784d5a5c56bbfc44', // From "client" -> "client_info" -> "mobilesdk_app_id"
-  //   messagingSenderId:
-  //       '264371954957', // From "project_info" -> "project_number"
-  //   projectId: 'propertyside-test', // From "project_info" -> "project_id"
-  //   storageBucket:
-  //       'propertyside-test.appspot.com', // From "project_info" -> "storage_bucket"
-  // );
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyCvN-HAjjnGuJS1sV5-XkhZ0BYnkxXZdPs',
