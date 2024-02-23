@@ -74,7 +74,7 @@ class TokenService {
       'token': response.data['token'],
       'apiKey': 'n63pcc3ue78p'
     };
-
+    print(jsonResponseVal['token']);
     return TokenResponse.fromJson(jsonResponseVal);
   }
 }

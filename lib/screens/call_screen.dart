@@ -67,7 +67,7 @@ class _CallScreenState extends State<CallScreen> {
     }
 
     // Create and watch channel for the call.
-    _channel = await _userChatRepo.createChannel(widget.call.id);
+    _channel = await _userChatRepo.createVideoChannel(widget.call.id);
 
     // Rebuild the widget to enable the chat button.
     if (mounted) setState(() {});

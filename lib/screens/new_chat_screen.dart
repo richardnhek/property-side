@@ -1,10 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart' as firebaseAuth;
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'package:flutter_dogfooding/core/model/user_credentials.dart';
+import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
 import '../core/repos/app_preferences.dart';
+import '../core/repos/token_service.dart';
 import '../di/injector.dart';
-import 'channel_screen.dart';
 
 class ContactsPage extends StatefulWidget {
   const ContactsPage({Key? key}) : super(key: key);
@@ -14,20 +15,49 @@ class ContactsPage extends StatefulWidget {
 }
 
 class _ContactsPageState extends State<ContactsPage> {
-  late final StreamUserListController userListController;
+  late final AppPreferences prefs;
+  late final UserCredentials credentials;
+  final client = StreamChatClient(
+    'n63pcc3ue78p',
+    logLevel: Level.INFO,
+  );
+  late final userListController = StreamUserListController(
+    client: client,
+    limit: 20,
+    filter: Filter.notEqual('id', 'test-property-side'),
+  );
 
   @override
   void initState() {
-    final prefs = locator.get<AppPreferences>();
-    final credentials = prefs.userCredentials;
-    StreamChatClient client = locator.get();
-    userListController = StreamUserListController(
-      client: client,
-      filter: Filter.notEqual('id', credentials!.userInfo.id),
-      limit: 20,
-    );
-    userListController.doInitialLoad();
     super.initState();
+    prefs = locator.get<AppPreferences>();
+    credentials = prefs.userCredentials!;
+    connectUserTest().then((_) {
+      // Ensures doInitialLoad is called after the user is connected
+      userListController.doInitialLoad();
+    }).catchError((error) {
+      // Handle or log error if user connection fails
+      print("Error connecting user: $error");
+    });
+  }
+
+  Future<void> connectUserTest() async {
+    try {
+      final tokenResponse = await locator
+          .get<TokenService>()
+          .loadToken(userId: credentials.userInfo.id);
+      final token = tokenResponse.token;
+      await client.connectUser(
+        OwnUser(
+          id: credentials.userInfo.id,
+        ),
+        token,
+      );
+    } catch (error) {
+      // Handle connection error
+      print("Failed to connect user: $error");
+      throw error; // Rethrow if you need to catch it outside
+    }
   }
 
   @override
@@ -39,6 +69,7 @@ class _ContactsPageState extends State<ContactsPage> {
   @override
   Widget build(BuildContext context) {
     return Material(
+      color: Colors.white,
       child: PagedValueListenableBuilder<int, User>(
         valueListenable: userListController,
         builder: (context, value, child) {
@@ -84,33 +115,30 @@ class _ContactTile extends StatefulWidget {
 
 class _ContactTileState extends State<_ContactTile> {
   Future<void> createChannel(BuildContext context) async {
-    // final core = StreamChatCore.of(context);
-    final prefs = locator.get<AppPreferences>();
-    final credentials = prefs.userCredentials;
-    final StreamChatClient client = locator.get();
+    final core = StreamChatCore.of(context);
     final nav = Navigator.of(context);
-    final members = [credentials!.userInfo.id, widget.user.id];
+    final members = [core.currentUser!.id, widget.user.id];
     final channel =
-        client.channel('messaging', extraData: {'members': members});
+        core.client.channel('messaging', extraData: {'members': members});
     await channel.watch();
 
     // ignore: use_build_context_synchronously
-    if (Navigator.of(context).canPop()) {
-      // ignore: use_build_context_synchronously
-      context.pop();
-    }
+    // if (Navigator.of(context).canPop()) {
+    //   // ignore: use_build_context_synchronously
+    //   context.pop();
+    // }
 
     // ignore: use_build_context_synchronously
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => StreamChannel(
-            channel: channel,
-            child: ChannelPage(
-              selectedMembers: members,
-            ),
-          ),
-        ));
+    // Navigator.push(
+    //     context,
+    //     MaterialPageRoute(
+    //       builder: (context) => StreamChannel(
+    //         channel: channel,
+    //         child: ChannelPage(
+    //           selectedMembers: members,
+    //         ),
+    //       ),
+    //     ));
   }
 
   @override
@@ -120,7 +148,7 @@ class _ContactTileState extends State<_ContactTile> {
         createChannel(context);
       },
       child: ListTile(
-        leading: const Icon(Icons.person),
+        // leading: Avatar.small(url: widget.user.image),
         title: Text(widget.user.name),
       ),
     );

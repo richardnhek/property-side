@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dogfooding/core/repos/token_service.dart';
 import 'package:flutter_dogfooding/router/routes.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart' as streamChat;
 import 'package:stream_video_flutter/stream_video_flutter.dart';
 import 'package:uni_links/uni_links.dart';
 
@@ -43,6 +44,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
     // Handle the message.
     await _handleRemoteMessage(message);
+    await _initChatClient(tokenResponse, credentials.userInfo.id);
   } catch (e, stk) {
     debugPrint('Error handling remote message: $e');
     debugPrint(stk.toString());
@@ -50,6 +52,22 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
   // Reset the injector once the message is handled.
   return AppInjector.reset();
+}
+
+Future<void> _initChatClient(
+    TokenResponse thisTokenResponse, String userId) async {
+  final client = streamChat.StreamChatClient(
+    'n63pcc3ue78p',
+    logLevel: streamChat.Level.INFO,
+  );
+
+  final token = thisTokenResponse.token;
+  await client.connectUser(
+    streamChat.OwnUser(
+      id: userId,
+    ),
+    token,
+  );
 }
 
 Future<bool> _handleRemoteMessage(RemoteMessage message) async {

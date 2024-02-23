@@ -27,8 +27,15 @@ class UserChatRepository {
 
   Future<void> disconnectUser() => chatClient.disconnectUser();
 
-  Future<Channel> createChannel(String channelId) async {
+  Future<Channel> createVideoChannel(String channelId) async {
     final channel = chatClient.channel(kMessageChannelType, id: channelId);
+    await channel.watch();
+    return channel;
+  }
+
+  Future<Channel> createChatChannel(List<String> members) async {
+    final channel =
+        chatClient.channel('messaging', extraData: {'members': members});
     await channel.watch();
     return channel;
   }

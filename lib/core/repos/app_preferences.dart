@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 // 🌎 Project imports:
 import 'package:flutter_dogfooding/core/model/user_credentials.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class AppPreferences {
   const AppPreferences({
