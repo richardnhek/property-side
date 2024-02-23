@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
+import '../core/model/user_credentials.dart';
 import '../core/repos/app_preferences.dart';
+import '../core/repos/token_service.dart';
 import '../di/injector.dart';
 import 'channel_screen.dart';
 
@@ -14,20 +16,50 @@ class ContactsPage extends StatefulWidget {
 }
 
 class _ContactsPageState extends State<ContactsPage> {
+  late final StreamChatClient client;
   late final StreamUserListController userListController;
+  late final AppPreferences prefs;
+  late final UserCredentials credentials;
 
   @override
   void initState() {
-    final prefs = locator.get<AppPreferences>();
-    final credentials = prefs.userCredentials;
-    StreamChatClient client = locator.get();
+    super.initState(); // Call `super.initState` first as a best practice
+    prefs = locator.get<AppPreferences>();
+    credentials = prefs.userCredentials!;
+    client = StreamChatCore.of(context).client;
     userListController = StreamUserListController(
       client: client,
-      filter: Filter.notEqual('id', credentials!.userInfo.id),
       limit: 20,
+      filter: Filter.notEqual('id', credentials.userInfo.id),
     );
     userListController.doInitialLoad();
-    super.initState();
+    // connectUserTest().then((_) {
+    //   userListController.doInitialLoad();
+    // }).catchError((error) {
+    //   // Handle or log error if user connection fails
+    //   print("Error connecting user: $error");
+    // });
+  }
+
+  Future<void> connectUserTest() async {
+    try {
+      final tokenResponse = await locator
+          .get<TokenService>()
+          .loadToken(userId: credentials.userInfo.id);
+      final token = tokenResponse.token;
+      // ignore: use_build_context_synchronously
+
+      await client.connectUser(
+        OwnUser(
+          id: credentials.userInfo.id,
+        ),
+        token,
+      );
+    } catch (error) {
+      // Handle connection error
+      print("Failed to connect user: $error");
+      throw error; // Rethrow if you need to catch it outside
+    }
   }
 
   @override
@@ -39,6 +71,7 @@ class _ContactsPageState extends State<ContactsPage> {
   @override
   Widget build(BuildContext context) {
     return Material(
+      color: Colors.white,
       child: PagedValueListenableBuilder<int, User>(
         valueListenable: userListController,
         builder: (context, value, child) {

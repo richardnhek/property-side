@@ -98,6 +98,7 @@ class AppInjector {
   }
 
   static void registerStreamChat(String apiKey) {
+    print("RegisterStreamChat: $apiKey");
     locator.registerSingleton<StreamChatClient>(
       _initStreamChat(apiKey),
       dispose: (client) => client.dispose(),
@@ -169,7 +170,32 @@ StreamChatClient _initStreamChat(String apiKey) {
     logLevel: Level.INFO,
   );
 
+  // connectChatUserDev(streamChatClient);
+
   return streamChatClient;
+}
+
+void connectChatUserDev(StreamChatClient thisClient) async {
+  final prefs = locator.get<AppPreferences>();
+  final credentials = prefs.userCredentials!;
+  try {
+    final tokenResponse = await locator
+        .get<TokenService>()
+        .loadToken(userId: credentials.userInfo.id);
+    final token = tokenResponse.token;
+    // ignore: use_build_context_synchronously
+
+    await thisClient.connectUser(
+      OwnUser(
+        id: credentials.userInfo.id,
+      ),
+      token,
+    );
+  } catch (error) {
+    // Handle connection error
+    print("Failed to connect user: $error");
+    throw error; // Rethrow if you need to catch it outside
+  }
 }
 
 StreamVideo _initStreamVideo(

@@ -41,6 +41,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       User(info: credentials.userInfo),
     );
 
+    // Initialise the chat client.
+    AppInjector.registerStreamChat(tokenResponse.apiKey);
+
     // Handle the message.
     await _handleRemoteMessage(message);
   } catch (e, stk) {
