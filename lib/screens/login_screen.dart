@@ -9,6 +9,7 @@ import 'package:flutter_dogfooding/app/user_auth_controller.dart';
 
 // 📦 Package imports:
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart' as strChat;
 import 'package:stream_video_flutter/stream_video_flutter.dart';
@@ -156,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _emailController,
                     style: const TextStyle(color: Colors.white),
                     decoration: const InputDecoration(
-                      labelText: 'Enter Email',
+                      labelText: 'Enter User ID',
                       isDense: true,
                       border: OutlineInputBorder(),
                     ),
@@ -170,7 +171,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       Color(0xff005FFF),
                     ),
                   ),
-                  child: const Text('Login with Email'),
+                  child: Text(
+                    'Login',
+                    style: GoogleFonts.inter(
+                        color: Colors.white, fontWeight: FontWeight.w500),
+                  ),
                 ),
                 const SizedBox(height: 48),
                 Padding(

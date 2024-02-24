@@ -15,6 +15,26 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
 
   String? _verificationId;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // _checkLoginState();
+    });
+  }
+
+  void _checkLoginState() {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+
+    if (user != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+    }
+  }
+
   void _sendOTP() async {
     await FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: _phoneController.text,
@@ -69,32 +89,36 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Phone Auth")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              controller: _phoneController,
-              decoration: const InputDecoration(hintText: "Phone Number"),
-              keyboardType: TextInputType.phone,
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: _sendOTP,
-              child: const Text("Send OTP"),
-            ),
-            TextField(
-              controller: _otpController,
-              decoration: const InputDecoration(hintText: "Enter OTP"),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: _verifyOTP,
-              child: const Text("Verify OTP"),
-            ),
-          ],
+      body: SafeArea(
+        top: true,
+        child: Padding(
+          padding: const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 50),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              TextField(
+                controller: _phoneController,
+                decoration: const InputDecoration(hintText: "Phone Number"),
+                keyboardType: TextInputType.phone,
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton(
+                onPressed: _sendOTP,
+                child: const Text("Send OTP"),
+              ),
+              TextField(
+                controller: _otpController,
+                decoration: const InputDecoration(hintText: "Enter OTP"),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton(
+                onPressed: _verifyOTP,
+                child: const Text("Verify OTP"),
+              ),
+            ],
+          ),
         ),
       ),
     );

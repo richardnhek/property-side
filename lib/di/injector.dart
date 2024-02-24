@@ -98,7 +98,6 @@ class AppInjector {
   }
 
   static void registerStreamChat(String apiKey) {
-    print("RegisterStreamChat: $apiKey");
     locator.registerSingleton<StreamChatClient>(
       _initStreamChat(apiKey),
       dispose: (client) => client.dispose(),

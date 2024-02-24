@@ -41,27 +41,6 @@ class _ContactsPageState extends State<ContactsPage> {
     // });
   }
 
-  Future<void> connectUserTest() async {
-    try {
-      final tokenResponse = await locator
-          .get<TokenService>()
-          .loadToken(userId: credentials.userInfo.id);
-      final token = tokenResponse.token;
-      // ignore: use_build_context_synchronously
-
-      await client.connectUser(
-        OwnUser(
-          id: credentials.userInfo.id,
-        ),
-        token,
-      );
-    } catch (error) {
-      // Handle connection error
-      print("Failed to connect user: $error");
-      throw error; // Rethrow if you need to catch it outside
-    }
-  }
-
   @override
   void dispose() {
     userListController.dispose();
