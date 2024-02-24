@@ -20,7 +20,7 @@ class SplashScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Hero(
-              tag: 'stream_logo',
+              tag: 'property-side',
               child: Image.asset(
                 streamVideoIconAsset,
                 width: size.width * 0.5,
@@ -28,7 +28,7 @@ class SplashScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'Stream Meetings',
+              'Property Side',
               style: GoogleFonts.inter(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
