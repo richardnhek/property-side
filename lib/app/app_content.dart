@@ -41,6 +41,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       User(info: credentials.userInfo),
     );
 
+    // Initialise the chat client.
+    AppInjector.registerStreamChat(tokenResponse.apiKey);
+
     // Handle the message.
     await _handleRemoteMessage(message);
   } catch (e, stk) {
@@ -229,7 +232,7 @@ class _StreamDogFoodingAppContentState
     return MaterialApp.router(
       title: kAppName,
       routerConfig: _router,
-      theme: _buildTheme(Brightness.dark),
+      theme: _buildTheme(Brightness.light),
       builder: (context, child) {
         return child!;
       },
@@ -247,7 +250,7 @@ class _StreamDogFoodingAppContentState
       inputDecorationTheme: const InputDecorationTheme(
         labelStyle: TextStyle(color: Colors.white),
       ),
-      extensions: <ThemeExtension<dynamic>>[StreamVideoTheme.dark()],
+      extensions: <ThemeExtension<dynamic>>[StreamVideoTheme.light()],
       textTheme: baseTextTheme.copyWith(
         bodyLarge: baseTextTheme.bodyLarge?.copyWith(
           color: Colors.white,

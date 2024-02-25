@@ -1,5 +1,6 @@
 // 🎯 Dart imports:
 import 'dart:async';
+import 'dart:math';
 
 // 🐦 Flutter imports:
 import 'package:flutter/foundation.dart';
@@ -8,10 +9,14 @@ import 'package:flutter_dogfooding/app/user_auth_controller.dart';
 
 // 📦 Package imports:
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart' as strChat;
 import 'package:stream_video_flutter/stream_video_flutter.dart';
 
 // 🌎 Project imports:
+import '../core/repos/app_preferences.dart';
+import '../core/repos/token_service.dart';
 import '../di/injector.dart';
 import '../utils/assets.dart';
 import '../utils/loading_dialog.dart';
@@ -46,8 +51,13 @@ class _LoginScreenState extends State<LoginScreen> {
     final email = _emailController.text;
     if (email.isEmpty) return debugPrint('Email is empty');
 
+    // Generate a random string of 12 digits
+    // final random = Random();
+    // final randomNumbers = List.generate(12, (_) => random.nextInt(8)).join('');
+    // final propertySideRandomId = 'buyer$randomNumbers';
+
     final userInfo = UserInfo(
-      role: 'admin',
+      role: 'user',
       id: email,
       name: email,
     );
@@ -74,8 +84,33 @@ class _LoginScreenState extends State<LoginScreen> {
     // Register StreamVideo client with the user.
     final authController = locator.get<UserAuthController>();
     await authController.login(user);
+    final strChat.StreamChatClient client = locator.get();
+    await connectChatUserDev(client);
 
     if (mounted) hideLoadingIndicator(context);
+  }
+
+  Future<void> connectChatUserDev(strChat.StreamChatClient thisClient) async {
+    final prefs = locator.get<AppPreferences>();
+    final credentials = prefs.userCredentials!;
+    try {
+      final tokenResponse = await locator
+          .get<TokenService>()
+          .loadToken(userId: credentials.userInfo.id);
+      final token = tokenResponse.token;
+      // ignore: use_build_context_synchronously
+
+      await thisClient.connectUser(
+        strChat.OwnUser(
+          id: credentials.userInfo.id,
+        ),
+        token,
+      );
+    } catch (error) {
+      // Handle connection error
+      print("Failed to connect user: $error");
+      throw error; // Rethrow if you need to catch it outside
+    }
   }
 
   @override
@@ -122,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _emailController,
                     style: const TextStyle(color: Colors.white),
                     decoration: const InputDecoration(
-                      labelText: 'Enter Email',
+                      labelText: 'Enter User ID',
                       isDense: true,
                       border: OutlineInputBorder(),
                     ),
@@ -136,7 +171,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       Color(0xff005FFF),
                     ),
                   ),
-                  child: const Text('Login with Email'),
+                  child: Text(
+                    'Login',
+                    style: GoogleFonts.inter(
+                        color: Colors.white, fontWeight: FontWeight.w500),
+                  ),
                 ),
                 const SizedBox(height: 48),
                 Padding(

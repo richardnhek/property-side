@@ -6,12 +6,8 @@ part of 'routes.dart';
 // GoRouterGenerator
 // **************************************************************************
 
-List<RouteBase> get $appRoutes => [
-      $homeRoute,
-      $loginRoute,
-      $lobbyRoute,
-      $callRoute,
-    ];
+List<RouteBase> get $appRoutes =>
+    [$homeRoute, $loginRoute, $lobbyRoute, $callRoute, $channelListRoute];
 
 RouteBase get $homeRoute => GoRouteData.$route(
       path: '/',
@@ -24,6 +20,53 @@ extension $HomeRouteExtension on HomeRoute {
 
   String get location => GoRouteData.$location(
         '/',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $channelListRoute => GoRouteData.$route(
+      path: '/channelList',
+      name: 'channelList',
+      factory: $ChannelListRouteExtension._fromState,
+    );
+
+extension $ChannelListRouteExtension on ChannelListRoute {
+  static ChannelListRoute _fromState(GoRouterState state) => ChannelListRoute();
+
+  String get location => GoRouteData.$location(
+        '/channelList',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $homePropertyRoute => GoRouteData.$route(
+      path: '/homeProperty',
+      name: 'homeProperty',
+      factory: $HomePropertyRouteExtension._fromState,
+    );
+
+extension $HomePropertyRouteExtension on HomePropertyRoute {
+  static HomePropertyRoute _fromState(GoRouterState state) =>
+      HomePropertyRoute();
+
+  String get location => GoRouteData.$location(
+        '/homeProperty',
       );
 
   void go(BuildContext context) => context.go(location);

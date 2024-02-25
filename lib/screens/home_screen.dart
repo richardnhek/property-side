@@ -2,7 +2,9 @@
 import 'dart:async';
 
 // 🐦 Flutter imports:
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dogfooding/screens/new_login/new_login_widget.dart';
 
 // 📦 Package imports:
 import 'package:stream_video_flutter/stream_video_flutter.dart';
@@ -15,6 +17,7 @@ import '../di/injector.dart';
 import '../utils/assets.dart';
 import '../utils/consts.dart';
 import '../utils/loading_dialog.dart';
+import 'channel_list.dart';
 import 'new_chat_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -144,6 +147,16 @@ class _HomeScreenState extends State<HomeScreen> {
     final size = MediaQuery.sizeOf(context);
     final name = currentUser!.name;
 
+    void logoutFirebaseUser() async {
+      await FirebaseAuth.instance.signOut();
+      // ignore: use_build_context_synchronously
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const NewLoginScreen(),
+          ));
+    }
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -160,10 +173,25 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(
+              Icons.chat_bubble,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ChannelList()),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(
               Icons.logout,
               color: Colors.white,
             ),
-            onPressed: _userAuthController.logout,
+            onPressed: () {
+              _userAuthController.logout;
+              logoutFirebaseUser();
+            },
           ),
           IconButton(
               onPressed: () {
@@ -183,28 +211,29 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.all(14),
           child: Column(
             children: [
-              Hero(
-                tag: 'stream_logo',
-                child: Image.asset(
-                  streamVideoIconAsset,
-                  width: size.width * 0.3,
-                ),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Stream Video Calling',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyLarge,
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Build reliable video calling, audio rooms, '
-                'and live streaming with our easy-to-use '
-                'SDKs and global edge network',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 36),
+              // Hero(
+              //   tag: 'stream_logo',
+              //   child: Image.asset(
+              //     streamVideoIconAsset,
+              //     width: size.width * 0.3,
+              //   ),
+              // ),
+              // const SizedBox(height: 24),
+              // Text(
+              //   'Stream Video Calling',
+              //   textAlign: TextAlign.center,
+              //   style: theme.textTheme.bodyLarge,
+              // ),
+              // // const SizedBox(height: 24),
+              // Text(
+              //   'Build reliable video calling, audio rooms, '
+              //   'and live streaming with our easy-to-use '
+              //   'SDKs and global edge network',
+              //   textAlign: TextAlign.center,
+              //   style: theme.textTheme.bodyMedium,
+              // ),
+              // const SizedBox(height: 36),
+
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(

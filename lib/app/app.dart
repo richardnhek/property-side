@@ -8,6 +8,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 // 🌎 Project imports:
 import 'package:flutter_dogfooding/di/injector.dart';
+import 'package:flutter_dogfooding/screens/new_login/new_login_widget.dart';
 import 'package:flutter_dogfooding/screens/splash_screen.dart';
 import 'package:stream_video_flutter/stream_video_flutter.dart'
     hide ConnectionState;
@@ -86,31 +87,32 @@ class _StreamDogFoodingAppState extends State<StreamDogFoodingApp> {
   @override
   Widget build(BuildContext context) {
     // Wait for app to load before showing anything.
-    return FutureBuilder(
-      future: _appLoader,
-      builder: (context, snapshot) {
-        // This means that the app is now ready to use.
-        if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.hasError) {
-            debugPrint(snapshot.error.toString());
-            debugPrint(snapshot.stackTrace.toString());
+    return MaterialApp(
+      home: FutureBuilder(
+        future: _appLoader,
+        builder: (context, snapshot) {
+          // This means that the app is now ready to use.
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasError) {
+              debugPrint(snapshot.error.toString());
+              debugPrint(snapshot.stackTrace.toString());
 
-            return const Directionality(
-              textDirection: TextDirection.ltr,
-              child: Center(child: Text('Error loading app')),
-            );
+              return const Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: Material(child: NewLoginScreen()));
+            }
+
+            return const StreamDogFoodingAppContent();
           }
 
-          return const StreamDogFoodingAppContent();
-        }
-
-        // Otherwise, show splash screen whilst waiting for loading
-        // to complete.
-        return const Directionality(
-          textDirection: TextDirection.ltr,
-          child: SplashScreen(),
-        );
-      },
+          // Otherwise, show splash screen whilst waiting for loading
+          // to complete.
+          return const Directionality(
+            textDirection: TextDirection.ltr,
+            child: SplashScreen(),
+          );
+        },
+      ),
     );
   }
 }

@@ -1,11 +1,15 @@
 // 📦 Package imports:
+import 'package:flutter/material.dart';
 import 'package:flutter_dogfooding/di/injector.dart';
 import 'package:go_router/go_router.dart';
 
 // 🌎 Project imports:
 import 'package:flutter_dogfooding/router/routes.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import '../app/user_auth_controller.dart';
+import '../flutter_flow/custom_icons.dart';
+import '../flutter_flow/flutter_flow_theme.dart';
 
 GoRouter initRouter(UserAuthController authNotifier) {
   return GoRouter(
@@ -15,12 +19,126 @@ GoRouter initRouter(UserAuthController authNotifier) {
           $homeRoute,
           $lobbyRoute,
           $callRoute,
+          $channelListRoute,
+          $homePropertyRoute
         ],
         builder: (context, state, child) {
+          // Current index for BottomNavigationBar
+          int currentIndex = 0;
+          // Determine the current index based on state
+          if (state.matchedLocation == HomeRoute().location) {
+            currentIndex = 0;
+          } else if (state.matchedLocation == ChannelListRoute().location) {
+            currentIndex = 1;
+          } else if (state.matchedLocation == HomePropertyRoute().location) {
+            currentIndex = 2;
+          }
+
           return StreamChat(
             client: locator.get(),
-            streamChatThemeData: StreamChatThemeData.dark(),
-            child: child,
+            streamChatThemeData: StreamChatThemeData.light(),
+            child: Scaffold(
+                body: child,
+                bottomNavigationBar: BottomNavigationBar(
+                  currentIndex: currentIndex,
+                  onTap: (index) {
+                    // Logic to navigate based on the index
+                    if (index == 0) {
+                      context.go(HomeRoute().location);
+                    } else if (index == 1) {
+                      context.go(ChannelListRoute().location);
+                    } else if (index == 2) {
+                      context.go(HomePropertyRoute().location);
+                    }
+                  },
+                  backgroundColor:
+                      FlutterFlowTheme.of(context).secondaryBackground,
+                  selectedItemColor: FlutterFlowTheme.of(context).primary,
+                  unselectedItemColor: const Color(0xFFAAAAAA),
+                  showSelectedLabels: true,
+                  showUnselectedLabels: true,
+                  unselectedFontSize: 10,
+                  selectedFontSize: 10,
+                  unselectedLabelStyle: GoogleFonts.inter(
+                      height: 1.5, fontWeight: FontWeight.w400),
+                  selectedLabelStyle: GoogleFonts.inter(
+                      height: 1.5, fontWeight: FontWeight.w400),
+                  type: BottomNavigationBarType.fixed,
+                  items: const <BottomNavigationBarItem>[
+                    BottomNavigationBarItem(
+                      icon: Icon(
+                        Icons.developer_mode,
+                        size: 18.0,
+                      ),
+                      activeIcon: Icon(
+                        Icons.developer_mode,
+                        size: 18.0,
+                      ),
+                      label: 'Dev',
+                      tooltip: '',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(
+                        FFIcons.kchat,
+                        size: 18.0,
+                      ),
+                      activeIcon: Icon(
+                        FFIcons.kchatActive,
+                        size: 18.0,
+                      ),
+                      label: 'Chats',
+                      tooltip: '',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(
+                        FFIcons.kicon,
+                        size: 18.0,
+                      ),
+                      activeIcon: Icon(
+                        FFIcons.khomeActive,
+                        size: 18.0,
+                      ),
+                      label: 'Search',
+                      tooltip: '',
+                    ),
+                    // BottomNavigationBarItem(
+                    //   icon: Icon(
+                    //     Icons.person_outline_rounded,
+                    //     size: 21.0,
+                    //   ),
+                    //   activeIcon: Icon(
+                    //     Icons.person,
+                    //     size: 21.0,
+                    //   ),
+                    //   label: 'Profile',
+                    //   tooltip: '',
+                    // ),
+                    // BottomNavigationBarItem(
+                    //   icon: Icon(
+                    //     FFIcons.krefer,
+                    //     size: 18.0,
+                    //   ),
+                    //   activeIcon: Icon(
+                    //     FFIcons.krefer,
+                    //     size: 18.0,
+                    //   ),
+                    //   label: 'Refer',
+                    //   tooltip: '',
+                    // ),
+                    // BottomNavigationBarItem(
+                    //   icon: Icon(
+                    //     FFIcons.kchat,
+                    //     size: 18.0,
+                    //   ),
+                    //   activeIcon: Icon(
+                    //     FFIcons.kchatActive,
+                    //     size: 18.0,
+                    //   ),
+                    //   label: 'New Chats',
+                    //   tooltip: '',
+                    // )
+                  ],
+                )),
           );
         },
       ),
