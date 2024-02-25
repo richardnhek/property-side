@@ -55,6 +55,30 @@ extension $ChannelListRouteExtension on ChannelListRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
+RouteBase get $homePropertyRoute => GoRouteData.$route(
+      path: '/homeProperty',
+      name: 'homeProperty',
+      factory: $HomePropertyRouteExtension._fromState,
+    );
+
+extension $HomePropertyRouteExtension on HomePropertyRoute {
+  static HomePropertyRoute _fromState(GoRouterState state) =>
+      HomePropertyRoute();
+
+  String get location => GoRouteData.$location(
+        '/homeProperty',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
 RouteBase get $loginRoute => GoRouteData.$route(
       path: '/login',
       name: 'login',

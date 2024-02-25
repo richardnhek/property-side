@@ -28,7 +28,7 @@ class SplashScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'Property Side',
+              'PropertySide',
               style: GoogleFonts.inter(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,

@@ -2,7 +2,9 @@
 import 'dart:async';
 
 // 🐦 Flutter imports:
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dogfooding/screens/new_login/new_login_widget.dart';
 
 // 📦 Package imports:
 import 'package:stream_video_flutter/stream_video_flutter.dart';
@@ -145,6 +147,16 @@ class _HomeScreenState extends State<HomeScreen> {
     final size = MediaQuery.sizeOf(context);
     final name = currentUser!.name;
 
+    void logoutFirebaseUser() async {
+      await FirebaseAuth.instance.signOut();
+      // ignore: use_build_context_synchronously
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const NewLoginScreen(),
+          ));
+    }
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -176,7 +188,10 @@ class _HomeScreenState extends State<HomeScreen> {
               Icons.logout,
               color: Colors.white,
             ),
-            onPressed: _userAuthController.logout,
+            onPressed: () {
+              _userAuthController.logout;
+              logoutFirebaseUser();
+            },
           ),
           IconButton(
               onPressed: () {

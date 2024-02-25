@@ -15,6 +15,7 @@ import 'package:flutter_dogfooding/screens/lobby_screen.dart';
 import '../core/repos/app_preferences.dart';
 import '../core/repos/token_service.dart';
 import '../di/injector.dart';
+import '../screens/home_property/home_property_widget.dart';
 import '../screens/login_screen.dart';
 import '../screens/new_login/new_login_widget.dart';
 
@@ -64,6 +65,15 @@ class ChannelListRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const ChannelList();
+  }
+}
+
+@immutable
+@TypedGoRoute<ChannelListRoute>(path: '/homeProperty', name: 'homeProperty')
+class HomePropertyRoute extends GoRouteData {
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const HomeProperty();
   }
 }
 

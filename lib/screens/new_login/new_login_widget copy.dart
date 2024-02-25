@@ -92,7 +92,6 @@ class _NewLoginScreenCopyState extends State<NewLoginScreenCopy> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Phone Auth")),
       body: SafeArea(
         top: true,
         child: Padding(
