@@ -55,6 +55,52 @@ extension $ChannelListRouteExtension on ChannelListRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
+RouteBase get $teamRoute => GoRouteData.$route(
+      path: '/team',
+      name: 'team',
+      factory: $TeamRouteExtension._fromState,
+    );
+
+extension $TeamRouteExtension on TeamRoute {
+  static TeamRoute _fromState(GoRouterState state) => TeamRoute();
+
+  String get location => GoRouteData.$location(
+        '/team',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $profileRoute => GoRouteData.$route(
+      path: '/profile',
+      name: 'profile',
+      factory: $ProfileRouteExtension._fromState,
+    );
+
+extension $ProfileRouteExtension on ProfileRoute {
+  static ProfileRoute _fromState(GoRouterState state) => ProfileRoute();
+
+  String get location => GoRouteData.$location(
+        '/profile',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
 RouteBase get $homePropertyRoute => GoRouteData.$route(
       path: '/homeProperty',
       name: 'homeProperty',

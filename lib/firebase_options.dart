@@ -72,15 +72,11 @@ class DefaultFirebaseOptions {
   // );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey:
-        'AIzaSyAAsFzCi9L-E9CuULP64MO_FVd8mo0J8S4', // From "api_key" -> "current_key"
-    appId:
-        '1:264371954957:android:436b2b784d5a5c56bbfc44', // From "client" -> "client_info" -> "mobilesdk_app_id"
-    messagingSenderId:
-        '264371954957', // From "project_info" -> "project_number"
-    projectId: 'propertyside-test', // From "project_info" -> "project_id"
-    storageBucket:
-        'propertyside-test.appspot.com', // From "project_info" -> "storage_bucket"
+    apiKey: 'AIzaSyAAsFzCi9L-E9CuULP64MO_FVd8mo0J8S4',
+    appId: '1:264371954957:android:436b2b784d5a5c56bbfc44',
+    messagingSenderId: '264371954957',
+    projectId: 'propertyside-test',
+    storageBucket: 'propertyside-test.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(

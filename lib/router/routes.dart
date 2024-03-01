@@ -2,6 +2,8 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebaseAuth;
 import 'package:flutter/material.dart';
 import 'package:flutter_dogfooding/screens/channel_list.dart';
+import 'package:flutter_dogfooding/screens/profile/profile_widget.dart';
+import 'package:flutter_dogfooding/screens/team/team_widget.dart';
 
 // 📦 Package imports:
 import 'package:go_router/go_router.dart';
@@ -74,6 +76,24 @@ class HomePropertyRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const HomeProperty();
+  }
+}
+
+@immutable
+@TypedGoRoute<ProfileRoute>(path: '/profile', name: 'profile')
+class ProfileRoute extends GoRouteData {
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const ProfileWidget();
+  }
+}
+
+@immutable
+@TypedGoRoute<TeamRoute>(path: '/team', name: 'team')
+class TeamRoute extends GoRouteData {
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const TeamWidget();
   }
 }
 

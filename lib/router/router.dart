@@ -20,7 +20,9 @@ GoRouter initRouter(UserAuthController authNotifier) {
           $lobbyRoute,
           $callRoute,
           $channelListRoute,
-          $homePropertyRoute
+          $homePropertyRoute,
+          $teamRoute,
+          $profileRoute
         ],
         builder: (context, state, child) {
           // Current index for BottomNavigationBar
@@ -32,6 +34,10 @@ GoRouter initRouter(UserAuthController authNotifier) {
             currentIndex = 1;
           } else if (state.matchedLocation == HomePropertyRoute().location) {
             currentIndex = 2;
+          } else if (state.matchedLocation == TeamRoute().location) {
+            currentIndex = 3;
+          } else if (state.matchedLocation == ProfileRoute().location) {
+            currentIndex = 4;
           }
 
           return StreamChat(
@@ -49,6 +55,10 @@ GoRouter initRouter(UserAuthController authNotifier) {
                       context.go(ChannelListRoute().location);
                     } else if (index == 2) {
                       context.go(HomePropertyRoute().location);
+                    } else if (index == 3) {
+                      context.go(TeamRoute().location);
+                    } else if (index == 4) {
+                      context.go(ProfileRoute().location);
                     }
                   },
                   backgroundColor:
@@ -99,6 +109,30 @@ GoRouter initRouter(UserAuthController authNotifier) {
                         size: 18.0,
                       ),
                       label: 'Search',
+                      tooltip: '',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(
+                        Icons.group_outlined,
+                        size: 18.0,
+                      ),
+                      activeIcon: Icon(
+                        Icons.group,
+                        size: 18.0,
+                      ),
+                      label: 'Team',
+                      tooltip: '',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(
+                        Icons.person_outline,
+                        size: 18.0,
+                      ),
+                      activeIcon: Icon(
+                        Icons.person,
+                        size: 18.0,
+                      ),
+                      label: 'Profile',
                       tooltip: '',
                     ),
                     // BottomNavigationBarItem(

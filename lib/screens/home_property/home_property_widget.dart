@@ -155,7 +155,7 @@ class _HomePropertyState extends State<HomeProperty> {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(0.0),
                                 child: Image.asset(
-                                  'assets/images/rea-logo.png',
+                                  'assets/rea-logo.png',
                                   fit: BoxFit.contain,
                                 ),
                               ),
@@ -213,7 +213,7 @@ class _HomePropertyState extends State<HomeProperty> {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(0.0),
                                 child: Image.asset(
-                                  'assets/images/listingloop.png',
+                                  'assets/listingloop.png',
                                   fit: BoxFit.contain,
                                 ),
                               ),
