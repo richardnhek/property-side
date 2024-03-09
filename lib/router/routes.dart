@@ -17,6 +17,7 @@ import 'package:flutter_dogfooding/screens/lobby_screen.dart';
 import '../core/repos/app_preferences.dart';
 import '../core/repos/token_service.dart';
 import '../di/injector.dart';
+import '../screens/code_verification/code_verification_page_widget.dart';
 import '../screens/home_property/home_property_widget.dart';
 import '../screens/login_screen.dart';
 import '../screens/new_login/new_login_widget.dart';
@@ -24,7 +25,7 @@ import '../screens/new_login/new_login_widget.dart';
 part 'routes.g.dart';
 
 @immutable
-@TypedGoRoute<HomeRoute>(path: '/', name: 'home')
+@TypedGoRoute<HomeRoute>(path: '/home', name: 'home')
 class HomeRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
@@ -102,9 +103,25 @@ class TeamRoute extends GoRouteData {
 class LoginRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    final firebaseAuth.FirebaseAuth auth = firebaseAuth.FirebaseAuth.instance;
-    final firebaseAuth.User? user = auth.currentUser;
-    return user != null ? const LoginScreen() : const NewLoginScreen();
+    // final firebaseAuth.FirebaseAuth auth = firebaseAuth.FirebaseAuth.instance;
+    // final firebaseAuth.User? user = auth.currentUser;
+    return const NewLoginScreen();
+  }
+}
+
+@immutable
+@TypedGoRoute<OTPRoute>(path: '/codeVerification', name: 'codeVerification')
+class OTPRoute extends GoRouteData {
+  const OTPRoute({required this.phoneNumber, required this.verificationId});
+
+  final String? phoneNumber;
+  final String? verificationId;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    // Correctly return the widget for OTP verification, passing parameters as needed
+    return CodeVerificationPageWidget(
+        phoneNumber: phoneNumber, verificationId: verificationId);
   }
 }
 

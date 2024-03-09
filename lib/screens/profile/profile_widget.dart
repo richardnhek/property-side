@@ -1,6 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../app/user_auth_controller.dart';
+import '../../di/injector.dart';
 import '../../flutter_flow/custom_icons.dart';
+import '../new_login/new_login_widget.dart';
 import '/auth/firebase_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -23,6 +27,7 @@ class ProfileWidget extends StatefulWidget {
 
 class _ProfileWidgetState extends State<ProfileWidget> {
   late ProfileModel _model;
+  late final _userAuthController = locator.get<UserAuthController>();
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -39,6 +44,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     _model.emailFocusNode ??= FocusNode();
 
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
+  }
+
+  Future<void> logoutFirebaseUser() async {
+    await FirebaseAuth.instance.signOut();
   }
 
   @override
@@ -615,7 +624,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           child: FFButtonWidget(
                             onPressed: () async {
                               // GoRouter.of(context).prepareAuthEvent();
-                              await authManager.signOut();
+                              await logoutFirebaseUser();
+                              await _userAuthController.logout();
                               // GoRouter.of(context).clearRedirectLocation();
 
                               // context.goNamedAuth('Onboard', context.mounted);

@@ -2,8 +2,9 @@
 import 'dart:async';
 
 // 🐦 Flutter imports:
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebaseAuth;
 import 'package:flutter/material.dart';
+import 'package:flutter_dogfooding/backend/backend.dart';
 import 'package:flutter_dogfooding/screens/new_login/new_login_widget.dart';
 
 // 📦 Package imports:
@@ -56,7 +57,42 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       },
     );
+    runQueryUser();
     super.initState();
+  }
+
+  void runQueryUser() async {
+    UsersRecord? userRecord = await fetchUserRecord();
+    if (userRecord != null) {
+      print("This is userRecord: $userRecord");
+      // Use userRecord as needed
+    }
+  }
+
+  Future<UsersRecord?> fetchUserRecord() async {
+    final firebaseAuth.User? firebaseUser =
+        firebaseAuth.FirebaseAuth.instance.currentUser;
+    if (firebaseUser != null) {
+      final String uid = firebaseUser.uid;
+      // Fetch the user document from Firestore
+      final DocumentSnapshot userDocSnapshot =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+      if (userDocSnapshot.exists) {
+        // Create a UsersRecord instance from the Firestore document
+        Map<String, dynamic> data =
+            userDocSnapshot.data() as Map<String, dynamic>;
+        UsersRecord userRecord =
+            UsersRecord.getDocumentFromData(data, userDocSnapshot.reference);
+        return userRecord;
+      } else {
+        print("User document does not exist in Firestore.");
+        return null;
+      }
+    } else {
+      print("No FirebaseAuth user is currently signed in.");
+      return null;
+    }
   }
 
   Future<void> _getOrCreateCall({List<String> memberIds = const []}) async {
@@ -148,7 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final name = currentUser!.name;
 
     void logoutFirebaseUser() async {
-      await FirebaseAuth.instance.signOut();
+      await firebaseAuth.FirebaseAuth.instance.signOut();
       // ignore: use_build_context_synchronously
       Navigator.push(
           context,

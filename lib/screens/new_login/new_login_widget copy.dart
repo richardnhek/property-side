@@ -5,7 +5,6 @@ import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_dogfooding/backend/backend.dart';
-import 'package:flutter_dogfooding/screens/code_verification/code_verification_page_widget.dart';
 import 'package:flutter_dogfooding/screens/home_screen.dart';
 import 'package:flutter_dogfooding/screens/login_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -89,35 +88,23 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
   }
 
   void _sendOTP() async {
-    try {
-      await FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber: _model.phoneNumberController.text,
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          await FirebaseAuth.instance.signInWithCredential(credential);
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Failed to send OTP: ${e.message}")),
-          );
-        },
-        codeSent: (String verificationId, int? resendToken) {
-          setState(() {
-            _verificationId = verificationId;
-          });
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {},
-      );
-      // ignore: use_build_context_synchronously
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => CodeVerificationPageWidget(
-                phoneNumber: _model.phoneNumberController.text,
-                verificationId: _verificationId)),
-      );
-    } catch (e) {
-      print("Phone sign in error: $e");
-    }
+    await FirebaseAuth.instance.verifyPhoneNumber(
+      phoneNumber: _model.phoneNumberController.text,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        await FirebaseAuth.instance.signInWithCredential(credential);
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to send OTP: ${e.message}")),
+        );
+      },
+      codeSent: (String verificationId, int? resendToken) {
+        setState(() {
+          _verificationId = verificationId;
+        });
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {},
+    );
   }
 
   Future<void> _login(strVideo.User user) async {
@@ -461,99 +448,99 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                                           ],
                                         ),
                                       ),
-                                      // Padding(
-                                      //   padding: EdgeInsets.only(top: 20.0),
-                                      //   child: Align(
-                                      //     alignment: const AlignmentDirectional(
-                                      //         -1.0, -1.0),
-                                      //     child: Text(
-                                      //       'OTP Code',
-                                      //       style: FlutterFlowTheme.of(context)
-                                      //           .headlineMedium
-                                      //           .override(
-                                      //             fontFamily: 'Inter',
-                                      //             fontSize: 14,
-                                      //             fontWeight: FontWeight.w500,
-                                      //             lineHeight: 1.5,
-                                      //           ),
-                                      //     ),
-                                      //   ),
-                                      // ),
-                                      // Padding(
-                                      //   padding: const EdgeInsetsDirectional
-                                      //       .fromSTEB(20.0, 10.0, 20.0, 0.0),
-                                      //   child: PinCodeTextField(
-                                      //     autoDisposeControllers: false,
-                                      //     appContext: context,
-                                      //     length: 6,
-                                      //     textStyle: FlutterFlowTheme.of(
-                                      //             context)
-                                      //         .titleSmall
-                                      //         .override(
-                                      //           fontFamily: 'Inter',
-                                      //           color:
-                                      //               FlutterFlowTheme.of(context)
-                                      //                   .primary,
-                                      //         ),
-                                      //     mainAxisAlignment:
-                                      //         MainAxisAlignment.spaceBetween,
-                                      //     enableActiveFill: false,
-                                      //     autoFocus: true,
-                                      //     enablePinAutofill: false,
-                                      //     errorTextSpace: 0.0,
-                                      //     showCursor: true,
-                                      //     cursorColor:
-                                      //         FlutterFlowTheme.of(context)
-                                      //             .primary,
-                                      //     obscureText: false,
-                                      //     hintCharacter: '*',
-                                      //     keyboardType: TextInputType.number,
-                                      //     pinTheme: PinTheme(
-                                      //       fieldHeight: 50.0,
-                                      //       fieldWidth: 50.0,
-                                      //       borderWidth: 1.0,
-                                      //       borderRadius:
-                                      //           const BorderRadius.only(
-                                      //         bottomLeft: Radius.circular(8.0),
-                                      //         bottomRight: Radius.circular(8.0),
-                                      //         topLeft: Radius.circular(8.0),
-                                      //         topRight: Radius.circular(8.0),
-                                      //       ),
-                                      //       shape: PinCodeFieldShape.box,
-                                      //       activeColor:
-                                      //           FlutterFlowTheme.of(context)
-                                      //               .primary,
-                                      //       inactiveColor:
-                                      //           FlutterFlowTheme.of(context)
-                                      //               .darkGrey2,
-                                      //       selectedColor:
-                                      //           FlutterFlowTheme.of(context)
-                                      //               .secondaryText,
-                                      //       activeFillColor:
-                                      //           FlutterFlowTheme.of(context)
-                                      //               .primary,
-                                      //       inactiveFillColor:
-                                      //           FlutterFlowTheme.of(context)
-                                      //               .darkGrey2,
-                                      //       selectedFillColor:
-                                      //           FlutterFlowTheme.of(context)
-                                      //               .secondaryText,
-                                      //     ),
-                                      //     controller: _model.pinCodeController,
-                                      //     onChanged: (_) {},
-                                      //     onCompleted: (_) async {
-                                      //       setState(() {
-                                      //         _model.isFilled = true;
-                                      //       });
-                                      //       _verifyOTP2();
-                                      //     },
-                                      //     autovalidateMode: AutovalidateMode
-                                      //         .onUserInteraction,
-                                      //     validator: _model
-                                      //         .pinCodeControllerValidator
-                                      //         .asValidator(context),
-                                      //   ),
-                                      // ),
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 20.0),
+                                        child: Align(
+                                          alignment: const AlignmentDirectional(
+                                              -1.0, -1.0),
+                                          child: Text(
+                                            'OTP Code',
+                                            style: FlutterFlowTheme.of(context)
+                                                .headlineMedium
+                                                .override(
+                                                  fontFamily: 'Inter',
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                  lineHeight: 1.5,
+                                                ),
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(20.0, 10.0, 20.0, 0.0),
+                                        child: PinCodeTextField(
+                                          autoDisposeControllers: false,
+                                          appContext: context,
+                                          length: 6,
+                                          textStyle: FlutterFlowTheme.of(
+                                                  context)
+                                              .titleSmall
+                                              .override(
+                                                fontFamily: 'Inter',
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .primary,
+                                              ),
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          enableActiveFill: false,
+                                          autoFocus: true,
+                                          enablePinAutofill: false,
+                                          errorTextSpace: 0.0,
+                                          showCursor: true,
+                                          cursorColor:
+                                              FlutterFlowTheme.of(context)
+                                                  .primary,
+                                          obscureText: false,
+                                          hintCharacter: '*',
+                                          keyboardType: TextInputType.number,
+                                          pinTheme: PinTheme(
+                                            fieldHeight: 50.0,
+                                            fieldWidth: 50.0,
+                                            borderWidth: 1.0,
+                                            borderRadius:
+                                                const BorderRadius.only(
+                                              bottomLeft: Radius.circular(8.0),
+                                              bottomRight: Radius.circular(8.0),
+                                              topLeft: Radius.circular(8.0),
+                                              topRight: Radius.circular(8.0),
+                                            ),
+                                            shape: PinCodeFieldShape.box,
+                                            activeColor:
+                                                FlutterFlowTheme.of(context)
+                                                    .primary,
+                                            inactiveColor:
+                                                FlutterFlowTheme.of(context)
+                                                    .darkGrey2,
+                                            selectedColor:
+                                                FlutterFlowTheme.of(context)
+                                                    .secondaryText,
+                                            activeFillColor:
+                                                FlutterFlowTheme.of(context)
+                                                    .primary,
+                                            inactiveFillColor:
+                                                FlutterFlowTheme.of(context)
+                                                    .darkGrey2,
+                                            selectedFillColor:
+                                                FlutterFlowTheme.of(context)
+                                                    .secondaryText,
+                                          ),
+                                          controller: _model.pinCodeController,
+                                          onChanged: (_) {},
+                                          onCompleted: (_) async {
+                                            setState(() {
+                                              _model.isFilled = true;
+                                            });
+                                            _verifyOTP2();
+                                          },
+                                          autovalidateMode: AutovalidateMode
+                                              .onUserInteraction,
+                                          validator: _model
+                                              .pinCodeControllerValidator
+                                              .asValidator(context),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),

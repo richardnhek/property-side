@@ -10,7 +10,7 @@ List<RouteBase> get $appRoutes =>
     [$homeRoute, $loginRoute, $lobbyRoute, $callRoute, $channelListRoute];
 
 RouteBase get $homeRoute => GoRouteData.$route(
-      path: '/',
+      path: '/home',
       name: 'home',
       factory: $HomeRouteExtension._fromState,
     );
@@ -19,7 +19,7 @@ extension $HomeRouteExtension on HomeRoute {
   static HomeRoute _fromState(GoRouterState state) => HomeRoute();
 
   String get location => GoRouteData.$location(
-        '/',
+        '/home',
       );
 
   void go(BuildContext context) => context.go(location);
@@ -126,7 +126,7 @@ extension $HomePropertyRouteExtension on HomePropertyRoute {
 }
 
 RouteBase get $loginRoute => GoRouteData.$route(
-      path: '/login',
+      path: '/',
       name: 'login',
       factory: $LoginRouteExtension._fromState,
     );
@@ -135,7 +135,7 @@ extension $LoginRouteExtension on LoginRoute {
   static LoginRoute _fromState(GoRouterState state) => LoginRoute();
 
   String get location => GoRouteData.$location(
-        '/login',
+        '/',
       );
 
   void go(BuildContext context) => context.go(location);

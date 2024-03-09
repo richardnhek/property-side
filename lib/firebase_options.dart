@@ -79,15 +79,25 @@ class DefaultFirebaseOptions {
     storageBucket: 'propertyside-test.appspot.com',
   );
 
+  // static const FirebaseOptions ios = FirebaseOptions(
+  //   apiKey: 'AIzaSyCvN-HAjjnGuJS1sV5-XkhZ0BYnkxXZdPs',
+  //   appId: '1:347024607410:ios:ffe113a4b22025cd8c21ab',
+  //   messagingSenderId: '347024607410',
+  //   projectId: 'stream-video-9b586',
+  //   storageBucket: 'stream-video-9b586.appspot.com',
+  //   iosClientId:
+  //       '347024607410-rdemfqlplsgrglpuc12itra4e4npo1p7.apps.googleusercontent.com',
+  //   iosBundleId: 'io.getstream.video.flutter.dogfooding',
+  // );
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCvN-HAjjnGuJS1sV5-XkhZ0BYnkxXZdPs',
-    appId: '1:347024607410:ios:ffe113a4b22025cd8c21ab',
-    messagingSenderId: '347024607410',
-    projectId: 'stream-video-9b586',
-    storageBucket: 'stream-video-9b586.appspot.com',
+    apiKey: 'AIzaSyDvP5JDD69_H9TBd_rCac0ypd-SFr3CtBk',
+    appId: '1:264371954957:ios:8d269be8a9538622bbfc44',
+    messagingSenderId: '264371954957',
+    projectId: 'propertyside-test',
+    storageBucket: 'propertyside-test.appspot.com',
     iosClientId:
-        '347024607410-rdemfqlplsgrglpuc12itra4e4npo1p7.apps.googleusercontent.com',
-    iosBundleId: 'io.getstream.video.flutter.dogfooding',
+        '264371954957-bbiqpnfb8f6566ojqp2gntj5t4vt5kef.apps.googleusercontent.com',
+    iosBundleId: 'com.propertyside.clientapp',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(

@@ -135,42 +135,6 @@ GoRouter initRouter(UserAuthController authNotifier) {
                       label: 'Profile',
                       tooltip: '',
                     ),
-                    // BottomNavigationBarItem(
-                    //   icon: Icon(
-                    //     Icons.person_outline_rounded,
-                    //     size: 21.0,
-                    //   ),
-                    //   activeIcon: Icon(
-                    //     Icons.person,
-                    //     size: 21.0,
-                    //   ),
-                    //   label: 'Profile',
-                    //   tooltip: '',
-                    // ),
-                    // BottomNavigationBarItem(
-                    //   icon: Icon(
-                    //     FFIcons.krefer,
-                    //     size: 18.0,
-                    //   ),
-                    //   activeIcon: Icon(
-                    //     FFIcons.krefer,
-                    //     size: 18.0,
-                    //   ),
-                    //   label: 'Refer',
-                    //   tooltip: '',
-                    // ),
-                    // BottomNavigationBarItem(
-                    //   icon: Icon(
-                    //     FFIcons.kchat,
-                    //     size: 18.0,
-                    //   ),
-                    //   activeIcon: Icon(
-                    //     FFIcons.kchatActive,
-                    //     size: 18.0,
-                    //   ),
-                    //   label: 'New Chats',
-                    //   tooltip: '',
-                    // )
                   ],
                 )),
           );
@@ -180,16 +144,11 @@ GoRouter initRouter(UserAuthController authNotifier) {
     ],
     refreshListenable: authNotifier,
     redirect: (context, state) {
-      // get the current user
       final currentUser = authNotifier.currentUser;
-
-      // if the user is not logged in, they need to login
       final bool loggedIn = currentUser != null;
       final bool loggingIn = state.matchedLocation == LoginRoute().location;
       if (!loggedIn && !loggingIn) return LoginRoute().location;
       if (loggedIn && loggingIn) return HomeRoute().location;
-
-      // no need to redirect at all
       return null;
     },
   );
