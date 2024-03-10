@@ -23,6 +23,7 @@ import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:flutter/material.dart';
+import '../../flutter_flow/custom_functions.dart' as functions;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -64,33 +65,33 @@ class _CodeVerificationPageWidgetState
     super.dispose();
   }
 
-  Future<UsersRecord?> fetchUserRecord() async {
-    final User? firebaseUser = FirebaseAuth.instance.currentUser;
-    if (firebaseUser != null) {
-      final String uid = firebaseUser.uid;
-      // Fetch the user document from Firestore
-      final DocumentSnapshot userDocSnapshot =
-          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+  // Future<UsersRecord?> fetchUserRecord() async {
+  //   final User? firebaseUser = FirebaseAuth.instance.currentUser;
+  //   if (firebaseUser != null) {
+  //     final String uid = firebaseUser.uid;
+  //     // Fetch the user document from Firestore
+  //     final DocumentSnapshot userDocSnapshot =
+  //         await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
-      if (userDocSnapshot.exists) {
-        // Create a UsersRecord instance from the Firestore document
-        Map<String, dynamic> data =
-            userDocSnapshot.data() as Map<String, dynamic>;
-        UsersRecord userRecord =
-            UsersRecord.getDocumentFromData(data, userDocSnapshot.reference);
-        return userRecord;
-      } else {
-        print("User document does not exist in Firestore.");
-        return null;
-      }
-    } else {
-      print("No FirebaseAuth user is currently signed in.");
-      return null;
-    }
-  }
+  //     if (userDocSnapshot.exists) {
+  //       // Create a UsersRecord instance from the Firestore document
+  //       Map<String, dynamic> data =
+  //           userDocSnapshot.data() as Map<String, dynamic>;
+  //       UsersRecord userRecord =
+  //           UsersRecord.getDocumentFromData(data, userDocSnapshot.reference);
+  //       return userRecord;
+  //     } else {
+  //       print("User document does not exist in Firestore.");
+  //       return null;
+  //     }
+  //   } else {
+  //     print("No FirebaseAuth user is currently signed in.");
+  //     return null;
+  //   }
+  // }
 
   Future<void> _loginWithPhoneNumber() async {
-    final UsersRecord? thisUsersRecord = await fetchUserRecord();
+    final UsersRecord? thisUsersRecord = await functions.fetchUserRecord();
     String userId;
     String userName;
 
@@ -151,7 +152,7 @@ class _CodeVerificationPageWidgetState
     }
   }
 
-  void _verifyOTP2(String otpCode) async {
+  Future<void> _verifyOTP2(String otpCode) async {
     setState(() {
       _verificationId = widget.verificationId;
     });
@@ -162,12 +163,6 @@ class _CodeVerificationPageWidgetState
 
     try {
       await FirebaseAuth.instance.signInWithCredential(credential);
-      print("After FirebaseAuth.instance.signInWithCredentials");
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("You are logged in!")),
-        );
-      }
     } catch (e) {
       if (mounted) {
         // Add this check
@@ -483,10 +478,11 @@ class _CodeVerificationPageWidgetState
                                       );
                                       return;
                                     }
-                                    _verifyOTP2(smsCodeVal);
+                                    await _verifyOTP2(smsCodeVal);
                                   },
                             text: 'Confirm',
                             options: FFButtonOptions(
+                              splashColor: FlutterFlowTheme.of(context).accent1,
                               width: double.infinity,
                               height: 50,
                               padding:

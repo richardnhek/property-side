@@ -1,19 +1,21 @@
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../app/user_auth_controller.dart';
+import '../../backend/backend.dart';
+import '../../backend/firebase_storage/storage.dart';
 import '../../di/injector.dart';
 import '../../flutter_flow/custom_icons.dart';
-import '../new_login/new_login_widget.dart';
+import '../../flutter_flow/upload_data.dart';
 import '/auth/firebase_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import '/flutter_flow/random_data_util.dart' as random_data;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../flutter_flow/custom_functions.dart' as functions;
 
 import 'profile_model.dart';
 export 'profile_model.dart';
@@ -28,6 +30,7 @@ class ProfileWidget extends StatefulWidget {
 class _ProfileWidgetState extends State<ProfileWidget> {
   late ProfileModel _model;
   late final _userAuthController = locator.get<UserAuthController>();
+  late final User user;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -35,19 +38,29 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => ProfileModel());
+    user = FirebaseAuth.instance.currentUser!;
 
-    _model.fullNameController ??=
-        TextEditingController(text: currentUserDisplayName);
+    _model.fullNameController ??= TextEditingController(text: '');
     _model.fullNameFocusNode ??= FocusNode();
+    _model.emailController ??= TextEditingController(text: '');
 
-    _model.emailController ??= TextEditingController(text: currentUserEmail);
     _model.emailFocusNode ??= FocusNode();
+
+    _fetchAndSetUserData();
 
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
   }
 
-  Future<void> logoutFirebaseUser() async {
-    await FirebaseAuth.instance.signOut();
+  Future<void> _fetchAndSetUserData() async {
+    final userRecord = await functions.fetchUserRecord();
+    if (userRecord != null) {
+      setState(() {
+        _model.fullNameController?.text = userRecord.displayName ?? '';
+        _model.emailController?.text = userRecord.email ?? '';
+        _model.userProPic = userRecord.photoUrl ?? '';
+        _model.originalUserProPic = userRecord.photoUrl ?? '';
+      });
+    }
   }
 
   @override
@@ -57,10 +70,83 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     super.dispose();
   }
 
+  Future<void> updateUserName(String newName) async {
+    // final user = FirebaseAuth.instance.currentUser;
+    if (newName.isNotEmpty) {
+      try {
+        // Update Firebase Auth user display name
+        await user.updateDisplayName(newName);
+        await user.reload(); // Reload the user data from Firebase Auth
+
+        // Update user record in Firestore
+        final userDocRef =
+            FirebaseFirestore.instance.collection('users').doc(user.uid);
+        await userDocRef.update({
+          'display_name': newName
+        }); // Make sure 'display_name' corresponds to your field in Firestore
+
+        // Optionally, refresh local user data
+        final updatedUser = FirebaseAuth.instance.currentUser;
+        final DocumentSnapshot userDocSnapshot = await userDocRef.get();
+        if (userDocSnapshot.exists) {
+          Map<String, dynamic> data =
+              userDocSnapshot.data() as Map<String, dynamic>;
+          UsersRecord userRecord =
+              UsersRecord.getDocumentFromData(data, userDocSnapshot.reference);
+          // Update any local state you have with this new userRecord
+        }
+
+        // Update the UI or local model to reflect the change
+        setState(() {
+          _model.fullNameController?.text = updatedUser?.displayName ?? '';
+        });
+
+        // Show success message
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Changes saved!')),
+        );
+      } catch (e) {
+        // Handle errors, for example log them or show a message to the user
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error saving changes')),
+        );
+        rethrow;
+      }
+    } else {
+      // Handle case where there is no user logged in, or the new name is empty
+      print('No user is signed in or the new name is empty.');
+    }
+  }
+
+  Future<void> updateUserProfilePicture() async {
+    if (_model.userProPic.isNotEmpty &&
+        _model.userProPic != _model.originalUserProPic) {
+      try {
+        // Update Firebase Auth user profile picture
+        await user.updatePhotoURL(_model.userProPic);
+        await user.reload(); // Reload the user data from Firebase Auth
+
+        // Update user record in Firestore
+        final userDocRef =
+            FirebaseFirestore.instance.collection('users').doc(user.uid);
+        await userDocRef.update({'photo_url': _model.userProPic});
+
+        setState(() {
+          _model.userProPic = user.photoURL ?? '';
+          _model.originalUserProPic = _model.userProPic;
+        });
+      } catch (e) {
+        rethrow;
+      }
+    } else {
+      // No changes made
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // context.watch<FFAppState>();
-
     return GestureDetector(
       onTap: () => _model.unfocusNode.canRequestFocus
           ? FocusScope.of(context).requestFocus(_model.unfocusNode)
@@ -154,31 +240,22 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                           width: 1,
                                         ),
                                       ),
-                                      child: AuthUserStreamWidget(
-                                        builder: (context) => TextFormField(
-                                          controller: _model.fullNameController,
-                                          focusNode: _model.fullNameFocusNode,
-                                          obscureText: false,
-                                          decoration: InputDecoration(
-                                            hintStyle: FlutterFlowTheme.of(
-                                                    context)
-                                                .headlineMedium
-                                                .override(
-                                                  fontFamily: 'Inter',
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .primaryText,
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.normal,
-                                                ),
-                                            enabledBorder: InputBorder.none,
-                                            focusedBorder: InputBorder.none,
-                                            errorBorder: InputBorder.none,
-                                            focusedErrorBorder:
-                                                InputBorder.none,
-                                            contentPadding: EdgeInsets.all(10),
-                                          ),
-                                          style: FlutterFlowTheme.of(context)
+                                      child: TextFormField(
+                                        controller: _model.fullNameController,
+                                        focusNode: _model.fullNameFocusNode,
+                                        onChanged: (_) => EasyDebounce.debounce(
+                                          '_model.fullNameController',
+                                          Duration(milliseconds: 100),
+                                          () async {
+                                            setState(() {
+                                              _model.isChanged = true;
+                                            });
+                                          },
+                                        ),
+                                        obscureText: false,
+                                        decoration: InputDecoration(
+                                          hintStyle: FlutterFlowTheme.of(
+                                                  context)
                                               .headlineMedium
                                               .override(
                                                 fontFamily: 'Inter',
@@ -188,10 +265,25 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.normal,
                                               ),
-                                          validator: _model
-                                              .fullNameControllerValidator
-                                              .asValidator(context),
+                                          enabledBorder: InputBorder.none,
+                                          focusedBorder: InputBorder.none,
+                                          errorBorder: InputBorder.none,
+                                          focusedErrorBorder: InputBorder.none,
+                                          contentPadding: EdgeInsets.all(10),
                                         ),
+                                        style: FlutterFlowTheme.of(context)
+                                            .headlineMedium
+                                            .override(
+                                              fontFamily: 'Inter',
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .primaryText,
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                        validator: _model
+                                            .fullNameControllerValidator
+                                            .asValidator(context),
                                       ),
                                     ),
                                   ),
@@ -238,43 +330,140 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                                     Duration(milliseconds: 500),
                                                 fadeOutDuration:
                                                     Duration(milliseconds: 500),
-                                                imageUrl:
-                                                    random_data.randomImageUrl(
-                                                  50,
-                                                  50,
-                                                ),
+                                                imageUrl: _model.userProPic,
                                                 width: 50,
                                                 height: 50,
                                                 fit: BoxFit.cover,
                                               ),
                                             ),
                                             Expanded(
-                                              child: Container(
-                                                height: 50,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.transparent,
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                  border: Border.all(
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .darkGrey3,
-                                                    width: 1,
+                                              child: InkWell(
+                                                onTap: () async {
+                                                  final selectedMedia =
+                                                      await selectMediaWithSourceBottomSheet(
+                                                    context: context,
+                                                    allowPhoto: true,
+                                                  );
+                                                  if (selectedMedia != null &&
+                                                      selectedMedia.every((m) =>
+                                                          validateFileFormat(
+                                                              m.storagePath,
+                                                              context))) {
+                                                    setState(() => _model
+                                                            .isDataUploading1 =
+                                                        true);
+                                                    var selectedUploadedFiles =
+                                                        <FFUploadedFile>[];
+                                                    var downloadUrls =
+                                                        <String>[];
+                                                    try {
+                                                      showUploadMessage(
+                                                        context,
+                                                        'Uploading file...',
+                                                        showLoading: true,
+                                                      );
+                                                      selectedUploadedFiles =
+                                                          selectedMedia
+                                                              .map((m) =>
+                                                                  FFUploadedFile(
+                                                                    name: m
+                                                                        .storagePath
+                                                                        .split(
+                                                                            '/')
+                                                                        .last,
+                                                                    bytes:
+                                                                        m.bytes,
+                                                                    height: m
+                                                                        .dimensions
+                                                                        ?.height,
+                                                                    width: m
+                                                                        .dimensions
+                                                                        ?.width,
+                                                                    blurHash: m
+                                                                        .blurHash,
+                                                                  ))
+                                                              .toList();
+                                                      downloadUrls =
+                                                          (await Future.wait(
+                                                        selectedMedia.map(
+                                                          (m) async =>
+                                                              await uploadData(
+                                                                  m.storagePath,
+                                                                  m.bytes),
+                                                        ),
+                                                      ))
+                                                              .where((u) =>
+                                                                  u != null)
+                                                              .map((u) => u!)
+                                                              .toList();
+                                                    } finally {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .hideCurrentSnackBar();
+                                                      _model.isDataUploading1 =
+                                                          false;
+                                                    }
+                                                    if (selectedUploadedFiles
+                                                                .length ==
+                                                            selectedMedia
+                                                                .length &&
+                                                        downloadUrls.length ==
+                                                            selectedMedia
+                                                                .length) {
+                                                      setState(() {
+                                                        _model.uploadedLocalFile1 =
+                                                            selectedUploadedFiles
+                                                                .first;
+                                                        _model.uploadedFileUrl1 =
+                                                            downloadUrls.first;
+                                                      });
+                                                      showUploadMessage(
+                                                          context, 'Success!');
+                                                    } else {
+                                                      setState(() {});
+                                                      showUploadMessage(context,
+                                                          'Failed to upload data');
+                                                      return;
+                                                    }
+                                                  }
+                                                  setState(() {
+                                                    _model.userProPic =
+                                                        _model.uploadedFileUrl1;
+                                                    _model.isChanged = true;
+                                                    print(
+                                                        "This is _model.userProPic: ${_model.userProPic}");
+                                                  });
+                                                },
+                                                child: Container(
+                                                  height: 50,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.transparent,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                    border: Border.all(
+                                                      color:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .darkGrey3,
+                                                      width: 1,
+                                                    ),
                                                   ),
-                                                ),
-                                                alignment:
-                                                    AlignmentDirectional(0, 0),
-                                                child: Text(
-                                                  'Upload',
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily: 'Inter',
-                                                        fontSize: 15,
-                                                        fontWeight:
-                                                            FontWeight.normal,
-                                                      ),
+                                                  alignment:
+                                                      AlignmentDirectional(
+                                                          0, 0),
+                                                  child: Text(
+                                                    'Upload',
+                                                    style: FlutterFlowTheme.of(
+                                                            context)
+                                                        .bodyMedium
+                                                        .override(
+                                                          fontFamily: 'Inter',
+                                                          fontSize: 15,
+                                                          fontWeight:
+                                                              FontWeight.normal,
+                                                        ),
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -329,8 +518,11 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                       child: FFButtonWidget(
                                         onPressed: (_model.isChanged == false)
                                             ? null
-                                            : () {
-                                                print('Button pressed ...');
+                                            : () async {
+                                                await _fetchAndSetUserData();
+                                                setState(() {
+                                                  _model.isChanged = false;
+                                                });
                                               },
                                         text: 'Discard changes',
                                         options: FFButtonOptions(
@@ -368,8 +560,18 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                       child: FFButtonWidget(
                                         onPressed: (_model.isChanged == false)
                                             ? null
-                                            : () {
-                                                print('Button pressed ...');
+                                            : () async {
+                                                await updateUserName(_model
+                                                        .fullNameController
+                                                        ?.text ??
+                                                    '');
+                                                if (_model.uploadedFileUrl1
+                                                    .isNotEmpty) {
+                                                  updateUserProfilePicture();
+                                                }
+                                                setState(() {
+                                                  _model.isChanged = false;
+                                                });
                                               },
                                         text: 'Save Changes',
                                         options: FFButtonOptions(
@@ -623,12 +825,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                               EdgeInsetsDirectional.fromSTEB(20, 20, 20, 0),
                           child: FFButtonWidget(
                             onPressed: () async {
-                              // GoRouter.of(context).prepareAuthEvent();
-                              await logoutFirebaseUser();
+                              await FirebaseAuth.instance.signOut();
                               await _userAuthController.logout();
-                              // GoRouter.of(context).clearRedirectLocation();
-
-                              // context.goNamedAuth('Onboard', context.mounted);
                             },
                             text: 'Logout',
                             icon: Icon(
@@ -636,6 +834,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                               size: 16,
                             ),
                             options: FFButtonOptions(
+                              splashColor: FlutterFlowTheme.of(context).accent1,
+                              hoverColor: FlutterFlowTheme.of(context).primary,
+                              hoverTextColor: Colors.white,
                               width: 140,
                               height: 50,
                               padding: EdgeInsets.all(0),
@@ -663,11 +864,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           padding:
                               EdgeInsetsDirectional.fromSTEB(20, 40, 20, 0),
                           child: FFButtonWidget(
-                            onPressed: true
-                                ? null
-                                : () {
-                                    print('Button pressed ...');
-                                  },
+                            onPressed: () async {
+                              print('Button pressed ...');
+                            },
                             text: 'Delete Account',
                             icon: Icon(
                               Icons.delete_outline,

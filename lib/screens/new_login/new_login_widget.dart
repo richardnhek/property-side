@@ -1,31 +1,20 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_dogfooding/backend/backend.dart';
 import 'package:flutter_dogfooding/screens/code_verification/code_verification_page_widget.dart';
-import 'package:flutter_dogfooding/screens/home_screen.dart';
-import 'package:flutter_dogfooding/screens/login_screen.dart';
-import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart' as strChat;
 
-import '../../app/user_auth_controller.dart';
-import '../../auth/firebase_auth/auth_util.dart';
 import '../../core/repos/app_preferences.dart';
 import '../../core/repos/token_service.dart';
 import '../../di/injector.dart';
 import '../../flutter_flow/flutter_flow_theme.dart';
 import '../../flutter_flow/flutter_flow_util.dart';
 import '../../flutter_flow/flutter_flow_widgets.dart';
-import '../../flutter_flow/nav/serialization_util.dart';
-import '../../utils/loading_dialog.dart';
 import 'new_login_model.dart';
 import '/flutter_flow/custom_functions.dart' as functions;
-import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:stream_video_flutter/stream_video_flutter.dart' as strVideo;
 
 class NewLoginScreen extends StatefulWidget {
   const NewLoginScreen({super.key});
@@ -55,40 +44,7 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
     });
   }
 
-  void _checkLoginState() {
-    final FirebaseAuth auth = FirebaseAuth.instance;
-    final User? user = auth.currentUser;
-
-    if (user != null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-      );
-    }
-  }
-
-  Future<void> _loginWithEmail() async {
-    final FirebaseAuth auth = FirebaseAuth.instance;
-    final User? user = auth.currentUser;
-    // Generate a random string of 12 digits
-    final random = Random();
-    final randomNumbers = List.generate(12, (_) => random.nextInt(8)).join('');
-    final propertySideRandomId = 'buyer$randomNumbers';
-    final propertySideRandomName = 'buyer-name$randomNumbers';
-
-    final userId = user != null ? user.uid : propertySideRandomId;
-    final userName = user?.displayName ?? propertySideRandomName;
-
-    final userInfo = strVideo.UserInfo(
-      role: 'user',
-      id: userId,
-      name: userName,
-    );
-
-    return _login(strVideo.User(info: userInfo));
-  }
-
-  void _sendOTP() async {
+  Future<void> _sendOTP() async {
     try {
       await FirebaseAuth.instance.verifyPhoneNumber(
         phoneNumber: _model.phoneNumberController.text,
@@ -116,20 +72,8 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                 verificationId: _verificationId)),
       );
     } catch (e) {
-      print("Phone sign in error: $e");
+      rethrow;
     }
-  }
-
-  Future<void> _login(strVideo.User user) async {
-    if (mounted) unawaited(showLoadingIndicator(context));
-
-    // Register StreamVideo client with the user.
-    final authController = locator.get<UserAuthController>();
-    await authController.login(user);
-    final strChat.StreamChatClient client = locator.get();
-    await connectChatUserDev(client);
-
-    if (mounted) hideLoadingIndicator(context);
   }
 
   Future<void> connectChatUserDev(strChat.StreamChatClient thisClient) async {
@@ -149,56 +93,7 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
         token,
       );
     } catch (error) {
-      // Handle connection error
-      print("Failed to connect user: $error");
-      throw error; // Rethrow if you need to catch it outside
-    }
-  }
-
-  void _verifyOTP2() async {
-    final credential = PhoneAuthProvider.credential(
-      verificationId: _verificationId!,
-      smsCode: _model.pinCodeController.text,
-    );
-
-    try {
-      await FirebaseAuth.instance.signInWithCredential(credential);
-      await _loginWithEmail();
-      // ignore: use_build_context_synchronously
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("You are logged in!")),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to verify OTP: $e")),
-      );
-    }
-  }
-
-  void _verifyOTP() async {
-    final credential = PhoneAuthProvider.credential(
-      verificationId: _verificationId!,
-      smsCode: _otpController.text,
-    );
-
-    try {
-      await FirebaseAuth.instance.signInWithCredential(credential);
-      // ignore: use_build_context_synchronously
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("You are logged in!")),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to verify OTP: $e")),
-      );
+      rethrow;
     }
   }
 
@@ -225,7 +120,7 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
               Align(
                 alignment: const AlignmentDirectional(-1.0, -1.0),
                 child: Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(20, 0, 0, 0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(20, 0, 0, 0),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(0),
                     child: Image.asset(
@@ -244,12 +139,12 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
               Expanded(
                 child: Container(
                   width: double.infinity,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.white,
                   ),
                   alignment: const AlignmentDirectional(0.0, -1.0),
                   child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 50),
+                    padding: const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 50),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -257,8 +152,8 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                         Align(
                           alignment: const AlignmentDirectional(0.0, 0.0),
                           child: Padding(
-                            padding:
-                                EdgeInsetsDirectional.fromSTEB(20, 0, 20, 0),
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                20, 0, 20, 0),
                             child: Column(
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -275,7 +170,7 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                                       ),
                                 ),
                                 Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
                                       0, 15, 0, 0),
                                   child: Text(
                                     'Please enter your phone number to verify and join the workspace.',
@@ -290,7 +185,7 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
                                       0, 40, 0, 0),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.max,
@@ -311,8 +206,8 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                                         ),
                                       ),
                                       Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                            0, 8, 0, 0),
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(0, 8, 0, 0),
                                         child: Row(
                                           mainAxisSize: MainAxisSize.max,
                                           mainAxisAlignment:
@@ -347,7 +242,7 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                                                       ScaffoldMessenger.of(
                                                               context)
                                                           .showSnackBar(
-                                                        SnackBar(
+                                                        const SnackBar(
                                                           content: Text(
                                                               'Phone Number is required and has to start with +.'),
                                                         ),
@@ -409,7 +304,8 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                                                     ),
                                                     errorBorder:
                                                         OutlineInputBorder(
-                                                      borderSide: BorderSide(
+                                                      borderSide:
+                                                          const BorderSide(
                                                         color:
                                                             Color(0x00000000),
                                                         width: 1,
@@ -420,7 +316,8 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                                                     ),
                                                     focusedErrorBorder:
                                                         OutlineInputBorder(
-                                                      borderSide: BorderSide(
+                                                      borderSide:
+                                                          const BorderSide(
                                                         color:
                                                             Color(0x00000000),
                                                         width: 1,
@@ -461,99 +358,6 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                                           ],
                                         ),
                                       ),
-                                      // Padding(
-                                      //   padding: EdgeInsets.only(top: 20.0),
-                                      //   child: Align(
-                                      //     alignment: const AlignmentDirectional(
-                                      //         -1.0, -1.0),
-                                      //     child: Text(
-                                      //       'OTP Code',
-                                      //       style: FlutterFlowTheme.of(context)
-                                      //           .headlineMedium
-                                      //           .override(
-                                      //             fontFamily: 'Inter',
-                                      //             fontSize: 14,
-                                      //             fontWeight: FontWeight.w500,
-                                      //             lineHeight: 1.5,
-                                      //           ),
-                                      //     ),
-                                      //   ),
-                                      // ),
-                                      // Padding(
-                                      //   padding: const EdgeInsetsDirectional
-                                      //       .fromSTEB(20.0, 10.0, 20.0, 0.0),
-                                      //   child: PinCodeTextField(
-                                      //     autoDisposeControllers: false,
-                                      //     appContext: context,
-                                      //     length: 6,
-                                      //     textStyle: FlutterFlowTheme.of(
-                                      //             context)
-                                      //         .titleSmall
-                                      //         .override(
-                                      //           fontFamily: 'Inter',
-                                      //           color:
-                                      //               FlutterFlowTheme.of(context)
-                                      //                   .primary,
-                                      //         ),
-                                      //     mainAxisAlignment:
-                                      //         MainAxisAlignment.spaceBetween,
-                                      //     enableActiveFill: false,
-                                      //     autoFocus: true,
-                                      //     enablePinAutofill: false,
-                                      //     errorTextSpace: 0.0,
-                                      //     showCursor: true,
-                                      //     cursorColor:
-                                      //         FlutterFlowTheme.of(context)
-                                      //             .primary,
-                                      //     obscureText: false,
-                                      //     hintCharacter: '*',
-                                      //     keyboardType: TextInputType.number,
-                                      //     pinTheme: PinTheme(
-                                      //       fieldHeight: 50.0,
-                                      //       fieldWidth: 50.0,
-                                      //       borderWidth: 1.0,
-                                      //       borderRadius:
-                                      //           const BorderRadius.only(
-                                      //         bottomLeft: Radius.circular(8.0),
-                                      //         bottomRight: Radius.circular(8.0),
-                                      //         topLeft: Radius.circular(8.0),
-                                      //         topRight: Radius.circular(8.0),
-                                      //       ),
-                                      //       shape: PinCodeFieldShape.box,
-                                      //       activeColor:
-                                      //           FlutterFlowTheme.of(context)
-                                      //               .primary,
-                                      //       inactiveColor:
-                                      //           FlutterFlowTheme.of(context)
-                                      //               .darkGrey2,
-                                      //       selectedColor:
-                                      //           FlutterFlowTheme.of(context)
-                                      //               .secondaryText,
-                                      //       activeFillColor:
-                                      //           FlutterFlowTheme.of(context)
-                                      //               .primary,
-                                      //       inactiveFillColor:
-                                      //           FlutterFlowTheme.of(context)
-                                      //               .darkGrey2,
-                                      //       selectedFillColor:
-                                      //           FlutterFlowTheme.of(context)
-                                      //               .secondaryText,
-                                      //     ),
-                                      //     controller: _model.pinCodeController,
-                                      //     onChanged: (_) {},
-                                      //     onCompleted: (_) async {
-                                      //       setState(() {
-                                      //         _model.isFilled = true;
-                                      //       });
-                                      //       _verifyOTP2();
-                                      //     },
-                                      //     autovalidateMode: AutovalidateMode
-                                      //         .onUserInteraction,
-                                      //     validator: _model
-                                      //         .pinCodeControllerValidator
-                                      //         .asValidator(context),
-                                      //   ),
-                                      // ),
                                     ],
                                   ),
                                 ),
@@ -562,34 +366,50 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(20, 0, 20, 0),
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              20, 0, 20, 0),
                           child: FFButtonWidget(
                             onPressed: (_model.phoneNumberController.text == '')
                                 ? null
                                 : () async {
-                                    final phoneNumberVal =
-                                        _model.phoneNumberController.text;
-                                    if (phoneNumberVal.isEmpty ||
-                                        !phoneNumberVal.startsWith('+')) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Phone Number is required and has to start with +.'),
-                                        ),
-                                      );
-                                      return;
+                                    _model.existingUser =
+                                        await queryUsersRecordOnce(
+                                      queryBuilder: (usersRecord) =>
+                                          usersRecord.where(
+                                        'phone_number',
+                                        isEqualTo:
+                                            functions.getFormattedPhoneNo(_model
+                                                .phoneNumberController.text),
+                                      ),
+                                      singleRecord: true,
+                                    ).then((s) => s.firstOrNull);
+                                    if ((_model.existingUser != null) == true) {
+                                      final phoneNumberVal =
+                                          _model.phoneNumberController.text;
+                                      if (phoneNumberVal.isEmpty ||
+                                          !phoneNumberVal.startsWith('+')) {
+                                        // ignore: use_build_context_synchronously
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                                'Phone Number is required and has to start with +.'),
+                                          ),
+                                        );
+                                        return;
+                                      }
+                                      await _sendOTP();
                                     }
-                                    _sendOTP();
                                   },
                             text: 'Continue',
                             options: FFButtonOptions(
+                              splashColor: FlutterFlowTheme.of(context).accent1,
                               width: double.infinity,
                               height: 50,
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                              iconPadding:
-                                  EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                  0, 0, 0, 0),
+                              iconPadding: const EdgeInsetsDirectional.fromSTEB(
+                                  0, 0, 0, 0),
                               color: FlutterFlowTheme.of(context).primary,
                               textStyle: FlutterFlowTheme.of(context)
                                   .titleSmall
@@ -598,7 +418,7 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                                     color: Colors.white,
                                   ),
                               elevation: 0,
-                              borderSide: BorderSide(
+                              borderSide: const BorderSide(
                                 color: Colors.transparent,
                                 width: 0,
                               ),
@@ -614,28 +434,6 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                 ),
               )
             ],
-            // children: [
-            //   TextField(
-            //     controller: _phoneController,
-            //     decoration: const InputDecoration(hintText: "Phone Number"),
-            //     keyboardType: TextInputType.phone,
-            //   ),
-            //   const SizedBox(height: 8),
-            //   ElevatedButton(
-            //     onPressed: _sendOTP,
-            //     child: const Text("Send OTP"),
-            //   ),
-            //   TextField(
-            //     controller: _otpController,
-            //     decoration: const InputDecoration(hintText: "Enter OTP"),
-            //     keyboardType: TextInputType.number,
-            //   ),
-            //   const SizedBox(height: 8),
-            //   ElevatedButton(
-            //     onPressed: _verifyOTP,
-            //     child: const Text("Verify OTP"),
-            //   ),
-            // ],
           ),
         ),
       ),

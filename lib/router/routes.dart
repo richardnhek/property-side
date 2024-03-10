@@ -17,6 +17,7 @@ import 'package:flutter_dogfooding/screens/lobby_screen.dart';
 import '../core/repos/app_preferences.dart';
 import '../core/repos/token_service.dart';
 import '../di/injector.dart';
+import '../screens/channel_screen.dart';
 import '../screens/code_verification/code_verification_page_widget.dart';
 import '../screens/home_property/home_property_widget.dart';
 import '../screens/login_screen.dart';
@@ -68,6 +69,21 @@ class ChannelListRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const ChannelList();
+  }
+}
+
+@immutable
+@TypedGoRoute<ChannelPageRoute>(path: '/channel', name: 'channel')
+class ChannelPageRoute extends GoRouteData {
+  const ChannelPageRoute({required this.selectedMembers});
+
+  final List<String?> selectedMembers;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return ChannelPage(
+      selectedMembers: selectedMembers,
+    );
   }
 }
 
