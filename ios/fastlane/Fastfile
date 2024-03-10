@@ -91,8 +91,8 @@ platform :ios do
       options[:readonly] = false
     end
     app_identifiers = [
-      'io.getstream.video.flutter.dogfooding',
-      'io.getstream.video.flutter.dogfooding.ScreenSharing',
+      'com.propertyside.clientapp',
+      'com.propertyside.clientapp.ScreenSharing',
     ]
     %w[development adhoc appstore].each do |type|
       match(
