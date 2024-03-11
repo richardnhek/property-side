@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 // 📦 Package imports:
 import 'package:crypto/crypto.dart';
+import 'package:go_router/go_router.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:stream_video_flutter/stream_video_flutter.dart' hide User;
 
@@ -31,47 +32,47 @@ class CallScreen extends StatefulWidget {
 class _CallScreenState extends State<CallScreen> {
   Channel? _channel;
   late final _streamVideo = locator.get<StreamVideo>();
-  late final _userChatRepo = locator.get<UserChatRepository>();
+  // late final _userChatRepo = locator.get<UserChatRepository>();
 
   @override
   void initState() {
     super.initState();
-    _connectChatChannel();
+    // _connectChatChannel();
   }
 
   @override
   void dispose() {
     widget.call.leave();
-    _userChatRepo.disconnectUser();
+    // _userChatRepo.disconnectUser();
     super.dispose();
   }
 
-  Future<void> _connectChatChannel() async {
-    final userAuthController = locator.get<UserAuthController>();
+  // Future<void> _connectChatChannel() async {
+  //   final userAuthController = locator.get<UserAuthController>();
 
-    // return if the video user is not yet logged in.
-    final currentUser = userAuthController.currentUser;
-    if (currentUser == null) return;
+  //   // return if the video user is not yet logged in.
+  //   final currentUser = userAuthController.currentUser;
+  //   if (currentUser == null) return;
 
-    // Connect the video user to the chat client if they are not already
-    // connected.
-    if (_userChatRepo.currentUser == null) {
-      final chatUID = md5.convert(utf8.encode(currentUser.id));
-      await _userChatRepo.connectUser(
-        User(
-          id: chatUID.toString(),
-          name: currentUser.name,
-          image: currentUser.image,
-        ),
-      );
-    }
+  //   // Connect the video user to the chat client if they are not already
+  //   // connected.
+  //   if (_userChatRepo.currentUser == null) {
+  //     final chatUID = md5.convert(utf8.encode(currentUser.id));
+  //     await _userChatRepo.connectUser(
+  //       User(
+  //         id: chatUID.toString(),
+  //         name: currentUser.name,
+  //         image: currentUser.image,
+  //       ),
+  //     );
+  //   }
 
-    // Create and watch channel for the call.
-    _channel = await _userChatRepo.createChannel(widget.call.id);
+  //   // Create and watch channel for the call.
+  //   _channel = await _userChatRepo.createChannel(widget.call.id);
 
-    // Rebuild the widget to enable the chat button.
-    if (mounted) setState(() {});
-  }
+  //   // Rebuild the widget to enable the chat button.
+  //   if (mounted) setState(() {});
+  // }
 
   void showChat(BuildContext context) {
     print("Show Chat");
@@ -125,7 +126,7 @@ class _CallScreenState extends State<CallScreen> {
                   CallControlOption(
                     icon: const Icon(Icons.chat_outlined),
                     onPressed: _channel != null //
-                        ? () => showChat(context)
+                        ? () => print("Chat")
                         : null,
                   ),
                   FlipCameraOption(
@@ -161,6 +162,7 @@ class _CallScreenState extends State<CallScreen> {
 
                       // End all calls.
                       _streamVideo.pushNotificationManager?.endAllCalls();
+                      // ignore: use_build_context_synchronously
                     },
                   ),
                 ],

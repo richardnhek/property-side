@@ -8,12 +8,15 @@ part of 'routes.dart';
 
 List<RouteBase> get $appRoutes => [
       $homeRoute,
+      $channelListRoute,
+      $channelPageRoute,
+      $homePropertyRoute,
+      $profileRoute,
+      $teamRoute,
       $loginRoute,
+      $oTPRoute,
       $lobbyRoute,
       $callRoute,
-      $channelListRoute,
-      $teamRoute,
-      $profileRoute
     ];
 
 RouteBase get $homeRoute => GoRouteData.$route(
@@ -62,40 +65,24 @@ extension $ChannelListRouteExtension on ChannelListRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
-RouteBase get $teamRoute => GoRouteData.$route(
-      path: '/team',
-      name: 'team',
-      factory: $TeamRouteExtension._fromState,
+RouteBase get $channelPageRoute => GoRouteData.$route(
+      path: '/channel',
+      name: 'channel',
+      factory: $ChannelPageRouteExtension._fromState,
     );
 
-extension $TeamRouteExtension on TeamRoute {
-  static TeamRoute _fromState(GoRouterState state) => TeamRoute();
-
-  String get location => GoRouteData.$location(
-        '/team',
+extension $ChannelPageRouteExtension on ChannelPageRoute {
+  static ChannelPageRoute _fromState(GoRouterState state) => ChannelPageRoute(
+        selectedMembers: state.uri.queryParametersAll['selected-members']!
+            .map((e) => e)
+            .toList(),
       );
 
-  void go(BuildContext context) => context.go(location);
-
-  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
-
-  void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location);
-
-  void replace(BuildContext context) => context.replace(location);
-}
-
-RouteBase get $profileRoute => GoRouteData.$route(
-      path: '/profile',
-      name: 'profile',
-      factory: $ProfileRouteExtension._fromState,
-    );
-
-extension $ProfileRouteExtension on ProfileRoute {
-  static ProfileRoute _fromState(GoRouterState state) => ProfileRoute();
-
   String get location => GoRouteData.$location(
-        '/profile',
+        '/channel',
+        queryParams: {
+          'selected-members': selectedMembers.map((e) => e).toList(),
+        },
       );
 
   void go(BuildContext context) => context.go(location);
@@ -132,6 +119,52 @@ extension $HomePropertyRouteExtension on HomePropertyRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
+RouteBase get $profileRoute => GoRouteData.$route(
+      path: '/profile',
+      name: 'profile',
+      factory: $ProfileRouteExtension._fromState,
+    );
+
+extension $ProfileRouteExtension on ProfileRoute {
+  static ProfileRoute _fromState(GoRouterState state) => ProfileRoute();
+
+  String get location => GoRouteData.$location(
+        '/profile',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $teamRoute => GoRouteData.$route(
+      path: '/team',
+      name: 'team',
+      factory: $TeamRouteExtension._fromState,
+    );
+
+extension $TeamRouteExtension on TeamRoute {
+  static TeamRoute _fromState(GoRouterState state) => TeamRoute();
+
+  String get location => GoRouteData.$location(
+        '/team',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
 RouteBase get $loginRoute => GoRouteData.$route(
       path: '/',
       name: 'login',
@@ -143,6 +176,36 @@ extension $LoginRouteExtension on LoginRoute {
 
   String get location => GoRouteData.$location(
         '/',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $oTPRoute => GoRouteData.$route(
+      path: '/codeVerification',
+      name: 'codeVerification',
+      factory: $OTPRouteExtension._fromState,
+    );
+
+extension $OTPRouteExtension on OTPRoute {
+  static OTPRoute _fromState(GoRouterState state) => OTPRoute(
+        phoneNumber: state.uri.queryParameters['phone-number'],
+        verificationId: state.uri.queryParameters['verification-id'],
+      );
+
+  String get location => GoRouteData.$location(
+        '/codeVerification',
+        queryParams: {
+          if (phoneNumber != null) 'phone-number': phoneNumber,
+          if (verificationId != null) 'verification-id': verificationId,
+        },
       );
 
   void go(BuildContext context) => context.go(location);

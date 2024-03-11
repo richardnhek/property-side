@@ -46,31 +46,33 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
 
   Future<void> _sendOTP() async {
     try {
-      await FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber: _model.phoneNumberController.text,
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          await FirebaseAuth.instance.signInWithCredential(credential);
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Failed to send OTP: ${e.message}")),
-          );
-        },
-        codeSent: (String verificationId, int? resendToken) {
-          setState(() {
-            _verificationId = verificationId;
-          });
-          print(_verificationId);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => CodeVerificationPageWidget(
-                    phoneNumber: _model.phoneNumberController.text,
-                    verificationId: _verificationId)),
-          );
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {},
-      );
+      await FirebaseAuth.instance
+          .verifyPhoneNumber(
+            phoneNumber: _model.phoneNumberController.text,
+            verificationCompleted: (PhoneAuthCredential credential) async {
+              await FirebaseAuth.instance.signInWithCredential(credential);
+            },
+            verificationFailed: (FirebaseAuthException e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Failed to send OTP: ${e.message}")),
+              );
+            },
+            codeSent: (String verificationId, int? resendToken) {
+              setState(() {
+                _verificationId = verificationId;
+              });
+              print(_verificationId);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => CodeVerificationPageWidget(
+                        phoneNumber: _model.phoneNumberController.text,
+                        verificationId: _verificationId)),
+              );
+            },
+            codeAutoRetrievalTimeout: (String verificationId) {},
+          )
+          .then((value) => null);
       // ignore: use_build_context_synchronously
     } catch (e) {
       rethrow;

@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart' as firebaseAuth;
 import 'package:flutter/material.dart';
 import 'package:flutter_dogfooding/backend/backend.dart';
 import 'package:flutter_dogfooding/screens/new_login/new_login_widget.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // 📦 Package imports:
 import 'package:stream_video_flutter/stream_video_flutter.dart';
@@ -158,158 +159,168 @@ class _HomeScreenState extends State<HomeScreen> {
           ));
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: theme.scaffoldBackgroundColor,
-        leading: Padding(
-          padding: const EdgeInsets.all(8),
-          child: StreamUserAvatar(user: currentUser),
-        ),
-        titleSpacing: 4,
-        title: Text(
-          name,
-          style: theme.textTheme.bodyMedium,
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.chat_bubble,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ChannelList()),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(
-              Icons.logout,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              _userAuthController.logout;
-              logoutFirebaseUser();
-            },
-          ),
-          IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ContactsPage()),
-                );
-              },
-              icon: const Icon(
-                Icons.edit,
-                color: Colors.white,
-              ))
-        ],
-      ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            children: [
-              // Hero(
-              //   tag: 'stream_logo',
-              //   child: Image.asset(
-              //     streamVideoIconAsset,
-              //     width: size.width * 0.3,
-              //   ),
-              // ),
-              // const SizedBox(height: 24),
-              // Text(
-              //   'Stream Video Calling',
-              //   textAlign: TextAlign.center,
-              //   style: theme.textTheme.bodyLarge,
-              // ),
-              // // const SizedBox(height: 24),
-              // Text(
-              //   'Build reliable video calling, audio rooms, '
-              //   'and live streaming with our easy-to-use '
-              //   'SDKs and global edge network',
-              //   textAlign: TextAlign.center,
-              //   style: theme.textTheme.bodyMedium,
-              // ),
-              // const SizedBox(height: 36),
-
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Call ID Number',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              _JoinForm(
-                callIdController: _callIdController,
-                onJoinPressed: _getOrCreateCall,
-              ),
-              const SizedBox(height: 24),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Don't have a call ID?",
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                    shape: MaterialStatePropertyAll(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                  onPressed: _getOrCreateCall,
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 14),
-                    child: Text('Start New Call'),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Want to directly call someone?",
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                    shape: MaterialStatePropertyAll(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                  onPressed: () => _directCall(context),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 14),
-                    child: Text('Direct Call'),
-                  ),
-                ),
-              ),
-            ],
-          ),
+    return Center(
+      child: SizedBox(
+        child: Text(
+          "PropertySide Beta 1.0.0",
+          style: GoogleFonts.inter(
+              fontSize: 18.0, color: Colors.grey, fontWeight: FontWeight.w500),
         ),
       ),
     );
+
+    // return Scaffold(
+    //   appBar: AppBar(
+    //     elevation: 0,
+    //     backgroundColor: theme.scaffoldBackgroundColor,
+    //     leading: Padding(
+    //       padding: const EdgeInsets.all(8),
+    //       child: StreamUserAvatar(user: currentUser),
+    //     ),
+    //     titleSpacing: 4,
+    //     title: Text(
+    //       name,
+    //       style: theme.textTheme.bodyMedium,
+    //     ),
+    //     actions: [
+    //       IconButton(
+    //         icon: const Icon(
+    //           Icons.chat_bubble,
+    //           color: Colors.white,
+    //         ),
+    //         onPressed: () {
+    //           Navigator.push(
+    //             context,
+    //             MaterialPageRoute(builder: (context) => const ChannelList()),
+    //           );
+    //         },
+    //       ),
+    //       IconButton(
+    //         icon: const Icon(
+    //           Icons.logout,
+    //           color: Colors.white,
+    //         ),
+    //         onPressed: () {
+    //           _userAuthController.logout;
+    //           logoutFirebaseUser();
+    //         },
+    //       ),
+    //       IconButton(
+    //           onPressed: () {
+    //             Navigator.push(
+    //               context,
+    //               MaterialPageRoute(builder: (context) => const ContactsPage()),
+    //             );
+    //           },
+    //           icon: const Icon(
+    //             Icons.edit,
+    //             color: Colors.white,
+    //           ))
+    //     ],
+    //   ),
+    //   body: Center(
+    //     child: SingleChildScrollView(
+    //       padding: const EdgeInsets.all(14),
+    //       child: Column(
+    //         children: [
+    //           // Hero(
+    //           //   tag: 'stream_logo',
+    //           //   child: Image.asset(
+    //           //     streamVideoIconAsset,
+    //           //     width: size.width * 0.3,
+    //           //   ),
+    //           // ),
+    //           // const SizedBox(height: 24),
+    //           // Text(
+    //           //   'Stream Video Calling',
+    //           //   textAlign: TextAlign.center,
+    //           //   style: theme.textTheme.bodyLarge,
+    //           // ),
+    //           // // const SizedBox(height: 24),
+    //           // Text(
+    //           //   'Build reliable video calling, audio rooms, '
+    //           //   'and live streaming with our easy-to-use '
+    //           //   'SDKs and global edge network',
+    //           //   textAlign: TextAlign.center,
+    //           //   style: theme.textTheme.bodyMedium,
+    //           // ),
+    //           // const SizedBox(height: 36),
+
+    //           Align(
+    //             alignment: Alignment.centerLeft,
+    //             child: Text(
+    //               'Call ID Number',
+    //               style: theme.textTheme.bodyMedium?.copyWith(
+    //                 fontSize: 12,
+    //               ),
+    //             ),
+    //           ),
+    //           const SizedBox(height: 8),
+    //           _JoinForm(
+    //             callIdController: _callIdController,
+    //             onJoinPressed: _getOrCreateCall,
+    //           ),
+    //           const SizedBox(height: 24),
+    //           Align(
+    //             alignment: Alignment.centerLeft,
+    //             child: Text(
+    //               "Don't have a call ID?",
+    //               style: theme.textTheme.bodyMedium?.copyWith(
+    //                 fontSize: 12,
+    //               ),
+    //             ),
+    //           ),
+    //           const SizedBox(height: 8),
+    //           SizedBox(
+    //             width: double.infinity,
+    //             child: ElevatedButton(
+    //               style: ButtonStyle(
+    //                 shape: MaterialStatePropertyAll(
+    //                   RoundedRectangleBorder(
+    //                     borderRadius: BorderRadius.circular(8),
+    //                   ),
+    //                 ),
+    //               ),
+    //               onPressed: _getOrCreateCall,
+    //               child: const Padding(
+    //                 padding: EdgeInsets.symmetric(vertical: 14),
+    //                 child: Text('Start New Call'),
+    //               ),
+    //             ),
+    //           ),
+    //           const SizedBox(height: 8),
+    //           Align(
+    //             alignment: Alignment.centerLeft,
+    //             child: Text(
+    //               "Want to directly call someone?",
+    //               style: theme.textTheme.bodyMedium?.copyWith(
+    //                 fontSize: 12,
+    //               ),
+    //             ),
+    //           ),
+    //           const SizedBox(height: 8),
+    //           SizedBox(
+    //             width: double.infinity,
+    //             child: ElevatedButton(
+    //               style: ButtonStyle(
+    //                 shape: MaterialStatePropertyAll(
+    //                   RoundedRectangleBorder(
+    //                     borderRadius: BorderRadius.circular(8),
+    //                   ),
+    //                 ),
+    //               ),
+    //               onPressed: () => _directCall(context),
+    //               child: const Padding(
+    //                 padding: EdgeInsets.symmetric(vertical: 14),
+    //                 child: Text('Direct Call'),
+    //               ),
+    //             ),
+    //           ),
+    //         ],
+    //       ),
+    //     ),
+    //   ),
+    // );
   }
 }
 

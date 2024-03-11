@@ -74,7 +74,7 @@ class _HomePropertyState extends State<HomeProperty> {
                       padding: const EdgeInsetsDirectional.fromSTEB(
                           20.0, 0.0, 0.0, 15.0),
                       child: Text(
-                        'Home',
+                        'Search',
                         style: FlutterFlowTheme.of(context).bodyMedium.override(
                               fontFamily: 'Inter',
                               fontSize: 17.0,

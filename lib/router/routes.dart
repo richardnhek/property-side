@@ -88,7 +88,7 @@ class ChannelPageRoute extends GoRouteData {
 }
 
 @immutable
-@TypedGoRoute<ChannelListRoute>(path: '/homeProperty', name: 'homeProperty')
+@TypedGoRoute<HomePropertyRoute>(path: '/homeProperty', name: 'homeProperty')
 class HomePropertyRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
@@ -115,12 +115,10 @@ class TeamRoute extends GoRouteData {
 }
 
 @immutable
-@TypedGoRoute<LoginRoute>(path: '/login', name: 'login')
+@TypedGoRoute<LoginRoute>(path: '/', name: 'login')
 class LoginRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    // final firebaseAuth.FirebaseAuth auth = firebaseAuth.FirebaseAuth.instance;
-    // final firebaseAuth.User? user = auth.currentUser;
     return const NewLoginScreen();
   }
 }

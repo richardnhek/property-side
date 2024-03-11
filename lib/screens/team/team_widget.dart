@@ -143,44 +143,47 @@ class _TeamWidgetState extends State<TeamWidget> {
           : FocusScope.of(context).unfocus(),
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FlutterFlowTheme.of(context).primaryBtnText,
+        backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
           automaticallyImplyLeading: false,
           actions: [],
           flexibleSpace: FlexibleSpaceBar(
             background: Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(20, 0, 0, 0),
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(0),
-                    child: Image.asset(
-                      'assets/logo.png',
-                      height: 35,
-                      fit: BoxFit.cover,
+              padding: EdgeInsetsDirectional.fromSTEB(20, 0, 0, 15),
+              child: Align(
+                alignment: Alignment(-1, 1),
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(0),
+                      child: Image.asset(
+                        'assets/logo.png',
+                        height: 35,
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(15, 0, 0, 0),
-                    child: Text(
-                      'Buying Team',
-                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                            fontFamily: 'Inter',
-                            fontSize: 17,
-                            lineHeight: 1.5,
-                          ),
+                    Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(15, 0, 0, 0),
+                      child: Text(
+                        'Buying Team',
+                        style: FlutterFlowTheme.of(context).bodyMedium.override(
+                              fontFamily: 'Inter',
+                              fontSize: 17,
+                              lineHeight: 1.5,
+                            ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             centerTitle: false,
             expandedTitleScale: 1.0,
           ),
           toolbarHeight: 75,
-          elevation: 1,
+          elevation: 0,
         ),
         body: SingleChildScrollView(
           primary: false,
@@ -229,16 +232,16 @@ class _TeamWidgetState extends State<TeamWidget> {
                                   ),
                         ),
                       ),
-                      Text(
-                        '(3)',
-                        textAlign: TextAlign.start,
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              fontFamily: 'Inter',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              lineHeight: 1.5,
-                            ),
-                      ),
+                      // Text(
+                      //   '(2)',
+                      //   textAlign: TextAlign.start,
+                      //   style: FlutterFlowTheme.of(context).bodyMedium.override(
+                      //         fontFamily: 'Inter',
+                      //         fontSize: 14,
+                      //         fontWeight: FontWeight.w500,
+                      //         lineHeight: 1.5,
+                      //       ),
+                      // ),
                     ],
                   ),
                 ),
@@ -320,7 +323,7 @@ class _TeamWidgetState extends State<TeamWidget> {
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(0, 0, 5, 0),
                         child: Text(
-                          'Your FinanceTeam',
+                          'Your Finance Team',
                           textAlign: TextAlign.start,
                           style:
                               FlutterFlowTheme.of(context).bodyMedium.override(
@@ -331,16 +334,16 @@ class _TeamWidgetState extends State<TeamWidget> {
                                   ),
                         ),
                       ),
-                      Text(
-                        '(3)',
-                        textAlign: TextAlign.start,
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              fontFamily: 'Inter',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              lineHeight: 1.5,
-                            ),
-                      ),
+                      // Text(
+                      //   '(4)',
+                      //   textAlign: TextAlign.start,
+                      //   style: FlutterFlowTheme.of(context).bodyMedium.override(
+                      //         fontFamily: 'Inter',
+                      //         fontSize: 14,
+                      //         fontWeight: FontWeight.w500,
+                      //         lineHeight: 1.5,
+                      //       ),
+                      // ),
                     ],
                   ),
                 ),
@@ -353,60 +356,52 @@ class _TeamWidgetState extends State<TeamWidget> {
                   children: [
                     Align(
                       alignment: AlignmentDirectional(-1, -1),
-                      child: Builder(
-                        builder: (context) {
-                          final financeTeamMembers = List.generate(
-                                  random_data.randomInteger(4, 4),
-                                  (index) => random_data.randomName(true, true))
-                              .toList();
+                      child: StreamBuilder<List<Map<String, dynamic>>>(
+                        stream:
+                            fetchSubteamUserDetails(currentUserId!, "Finance"),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return CircularProgressIndicator(
+                                color: FlutterFlowTheme.of(context).primary);
+                          }
+                          List<Map<String, dynamic>> personalTeamMembers =
+                              snapshot.data!;
                           return SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: List.generate(financeTeamMembers.length,
-                                  (financeTeamMembersIndex) {
-                                final financeTeamMembersItem =
-                                    financeTeamMembers[financeTeamMembersIndex];
-                                return Container(
-                                  constraints: BoxConstraints(
-                                    maxWidth: 70,
-                                  ),
-                                  decoration: BoxDecoration(),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.max,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(5),
-                                        child: Image.network(
-                                          random_data.randomImageUrl(
-                                            65,
-                                            65,
+                              children: personalTeamMembers
+                                  .map((userDetails) {
+                                    return Container(
+                                      constraints: BoxConstraints(maxWidth: 70),
+                                      child: Column(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(5),
+                                            child: Image.network(
+                                              userDetails[
+                                                  'photo_url'], // Assuming 'photo_url' is the field for the user's photo
+                                              width: 65,
+                                              height: 65,
+                                              fit: BoxFit.cover,
+                                            ),
                                           ),
-                                          width: double.infinity,
-                                          height: 65,
-                                          fit: BoxFit.cover,
-                                        ),
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 10),
+                                            child: Text(
+                                              userDetails[
+                                                  'display_name'], // Assuming 'display_name' is the field for the user's name
+                                              style:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyText1,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                            0, 10, 0, 0),
-                                        child: Text(
-                                          financeTeamMembersItem,
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Inter',
-                                                fontSize: 14,
-                                              ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }).divide(SizedBox(width: 15)),
+                                    );
+                                  })
+                                  .toList()
+                                  .divide(SizedBox(width: 15)),
                             ),
                           );
                         },
@@ -441,16 +436,16 @@ class _TeamWidgetState extends State<TeamWidget> {
                                   ),
                         ),
                       ),
-                      Text(
-                        '(3)',
-                        textAlign: TextAlign.start,
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              fontFamily: 'Inter',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              lineHeight: 1.5,
-                            ),
-                      ),
+                      // Text(
+                      //   '(4)',
+                      //   textAlign: TextAlign.start,
+                      //   style: FlutterFlowTheme.of(context).bodyMedium.override(
+                      //         fontFamily: 'Inter',
+                      //         fontSize: 14,
+                      //         fontWeight: FontWeight.w500,
+                      //         lineHeight: 1.5,
+                      //       ),
+                      // ),
                     ],
                   ),
                 ),
@@ -462,66 +457,58 @@ class _TeamWidgetState extends State<TeamWidget> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Align(
-                      alignment: AlignmentDirectional(-1, -1),
-                      child: Builder(
-                        builder: (context) {
-                          final buyingTeamMembers = List.generate(
-                                  random_data.randomInteger(4, 4),
-                                  (index) => random_data.randomName(true, true))
-                              .toList();
-                          return SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: List.generate(buyingTeamMembers.length,
-                                  (buyingTeamMembersIndex) {
-                                final buyingTeamMembersItem =
-                                    buyingTeamMembers[buyingTeamMembersIndex];
-                                return Container(
-                                  constraints: BoxConstraints(
-                                    maxWidth: 70,
-                                  ),
-                                  decoration: BoxDecoration(),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.max,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(5),
-                                        child: Image.network(
-                                          random_data.randomImageUrl(
-                                            65,
-                                            65,
-                                          ),
-                                          width: double.infinity,
-                                          height: 65,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                            0, 10, 0, 0),
-                                        child: Text(
-                                          buyingTeamMembersItem,
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Inter',
-                                                fontSize: 14,
+                        alignment: AlignmentDirectional(-1, -1),
+                        child: StreamBuilder<List<Map<String, dynamic>>>(
+                          stream: fetchSubteamUserDetails(
+                              currentUserId!, "Finance"),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) {
+                              return CircularProgressIndicator(
+                                  color: FlutterFlowTheme.of(context).primary);
+                            }
+                            List<Map<String, dynamic>> personalTeamMembers =
+                                snapshot.data!;
+                            return SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: personalTeamMembers
+                                    .map((userDetails) {
+                                      return Container(
+                                        constraints:
+                                            BoxConstraints(maxWidth: 70),
+                                        child: Column(
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                              child: Image.network(
+                                                userDetails[
+                                                    'photo_url'], // Assuming 'photo_url' is the field for the user's photo
+                                                width: 65,
+                                                height: 65,
+                                                fit: BoxFit.cover,
                                               ),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.only(top: 10),
+                                              child: Text(
+                                                userDetails[
+                                                    'display_name'], // Assuming 'display_name' is the field for the user's name
+                                                style:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyText1,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }).divide(SizedBox(width: 15)),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
+                                      );
+                                    })
+                                    .toList()
+                                    .divide(SizedBox(width: 15)),
+                              ),
+                            );
+                          },
+                        )),
                   ].divide(SizedBox(width: 15)),
                 ),
               ),

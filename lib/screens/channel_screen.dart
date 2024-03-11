@@ -8,10 +8,12 @@ import 'package:stream_chat_flutter/stream_chat_flutter.dart' as streamFlutter;
 import 'package:stream_video_flutter/stream_video_flutter.dart';
 import 'package:stream_video_push_notification/stream_video_push_notification.dart';
 
+import '../app_state.dart';
 import '../di/injector.dart';
 import '../router/routes.dart';
 import '../utils/consts.dart';
 import '../utils/loading_dialog.dart';
+import 'call_screen.dart';
 
 class ChannelPage extends StatefulWidget {
   const ChannelPage({required this.selectedMembers, super.key});
@@ -39,11 +41,16 @@ class _ChannelPageState extends State<ChannelPage> {
 
   @override
   Widget build(BuildContext context) {
-    Future<void> getOrCreateCall({List<String> memberIds = const []}) async {
+    Future<void> getOrCreateCall(
+        {List<String> memberIds = const [], String? specificCallType}) async {
       var callId = generateAlphanumericString(12);
 
-      // unawaited(showLoadingIndicator(context));
-      _call = _streamVideo.makeCall(type: kCallType, id: callId);
+      // Assume showLoadingIndicator(context) is to display a loading animation.
+      // unawaited(showLoadingIndicator(context)); // Uncomment or use according to your needs.
+
+      _call = _streamVideo.makeCall(
+          type: specificCallType ?? kCallType,
+          id: callId); // Make sure 'kCallType' is defined or replace it with default call type.
 
       try {
         await _call!.getOrCreate(
@@ -53,11 +60,29 @@ class _ChannelPageState extends State<ChannelPage> {
       } catch (e, stk) {
         debugPrint('Error joining or creating call: $e');
         debugPrint(stk.toString());
+        // If there's an error, ideally you should handle it, for example, by showing an error message.
+        return; // Return from the function if there was an error.
       }
 
       if (mounted) {
-        // hideLoadingIndicator(context);
-        LobbyRoute($extra: _call!).push(context);
+        // hideLoadingIndicator(context); // Uncomment or use according to your needs.
+
+        CallConnectOptions connectOptions = CallConnectOptions(
+            camera: TrackOption.disabled(),
+            microphone: TrackOption.enabled(),
+            screenShare: TrackOption.disabled());
+
+        if (memberIds.length > 2) {
+          LobbyRoute($extra: _call!).push(context);
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  CallScreen(call: _call!, connectOptions: connectOptions),
+            ),
+          );
+        }
       }
     }
 
@@ -70,8 +95,11 @@ class _ChannelPageState extends State<ChannelPage> {
             padding: const EdgeInsets.only(right: 15.0),
             child: Row(
               children: [
-                GestureDetector(
-                  onTap: () async {},
+                InkWell(
+                  onTap: () {
+                    getOrCreateCall(
+                        memberIds: memberList, specificCallType: 'audio_room');
+                  },
                   child: Icon(
                     Icons.call,
                     size: 24,
@@ -81,7 +109,7 @@ class _ChannelPageState extends State<ChannelPage> {
                 const SizedBox(
                   width: 20.0,
                 ),
-                GestureDetector(
+                InkWell(
                   onTap: () {
                     getOrCreateCall(memberIds: memberList);
                   },
