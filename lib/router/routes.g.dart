@@ -6,8 +6,15 @@ part of 'routes.dart';
 // GoRouterGenerator
 // **************************************************************************
 
-List<RouteBase> get $appRoutes =>
-    [$homeRoute, $loginRoute, $lobbyRoute, $callRoute, $channelListRoute];
+List<RouteBase> get $appRoutes => [
+      $homeRoute,
+      $loginRoute,
+      $lobbyRoute,
+      $callRoute,
+      $channelListRoute,
+      $teamRoute,
+      $profileRoute
+    ];
 
 RouteBase get $homeRoute => GoRouteData.$route(
       path: '/home',
