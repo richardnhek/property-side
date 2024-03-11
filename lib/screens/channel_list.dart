@@ -27,6 +27,10 @@ class _ChannelListState extends State<ChannelList> {
   OwnUser? currentChatUser;
   late final AppPreferences prefs;
   late final UserCredentials credentials;
+  List<String> _selectedChannelIds = [];
+  bool _isSelectionMode = false;
+  bool _canDeleteSelectedChannels = false;
+  bool _isCheckingDeletable = false;
 
   @override
   void initState() {
@@ -44,6 +48,36 @@ class _ChannelListState extends State<ChannelList> {
       channelStateSort: const [SortOption('last_message_at')],
       limit: 20,
     );
+  }
+
+  Future<void> deleteSelectedChannels() async {
+    for (String channelId in _selectedChannelIds) {
+      final channel = client.channel('messaging', id: channelId);
+      await channel.delete();
+    }
+    setState(() {
+      _selectedChannelIds.clear(); // Clear selection after deletion
+    });
+    // Optionally, refresh your channel list here if necessary
+  }
+
+  Future<void> updateCanDeleteStatus() async {
+    setState(() {
+      _isCheckingDeletable = true;
+    });
+    bool canDelete = true;
+    for (String channelId in _selectedChannelIds) {
+      final channel = client.channel('messaging', id: channelId);
+      final response = await channel.queryMembers();
+      if (response.members.length > 2) {
+        canDelete = false;
+        break;
+      }
+    }
+    setState(() {
+      _canDeleteSelectedChannels = canDelete;
+      _isCheckingDeletable = false;
+    });
   }
 
   void connectChatUser() async {
@@ -116,6 +150,29 @@ class _ChannelListState extends State<ChannelList> {
           centerTitle: true,
           elevation: 0,
           actions: [
+            if (_selectedChannelIds.isNotEmpty)
+              _isCheckingDeletable
+                  ? const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10.0),
+                      child: SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.grey, // or any other color
+                          ),
+                        ),
+                      ),
+                    )
+                  : IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: _selectedChannelIds.isNotEmpty &&
+                              _canDeleteSelectedChannels
+                          ? () {
+                              // Your existing deletion confirmation logic
+                            }
+                          : null, // Disable button if deletion is not allowed
+                    ),
             InkWell(
               onTap: () {
                 Navigator.push(
@@ -147,40 +204,57 @@ class _ChannelListState extends State<ChannelList> {
             ),
           ],
           leading: Center(
-            child: Container(
-              width: 27,
-              height: 27,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: FlutterFlowTheme.of(context).primary,
-                  width: 1.5,
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  _isSelectionMode = !_isSelectionMode;
+                  if (!_isSelectionMode) {
+                    _selectedChannelIds
+                        .clear(); // Clear selections when leaving selection mode
+                  }
+                });
+              },
+              child: Container(
+                width: 27,
+                height: 27,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: FlutterFlowTheme.of(context).primary,
+                    width: 1.5,
+                  ),
                 ),
-              ),
-              child: Align(
-                alignment: AlignmentDirectional(0, 0),
-                child: Icon(
-                  Icons.keyboard_control_rounded,
-                  color: FlutterFlowTheme.of(context).primary,
-                  size: 24,
+                child: Align(
+                  alignment: AlignmentDirectional(0, 0),
+                  child: Icon(
+                    _isSelectionMode
+                        ? Icons.close
+                        : Icons.keyboard_control_rounded,
+                    color: FlutterFlowTheme.of(context).primary,
+                    size: 24,
+                  ),
                 ),
               ),
             ),
           ),
           titleBuilder: (context, status, client) {
-            return Container(
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-              ),
-              child: Text(
-                'Chats',
-                style: FlutterFlowTheme.of(context).bodyMedium.override(
-                      fontFamily: 'Inter',
-                      fontSize: 21,
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-            );
+            return !_isSelectionMode
+                ? Text(
+                    'Chats',
+                    style: FlutterFlowTheme.of(context).bodyMedium.override(
+                          fontFamily: 'Inter',
+                          fontSize: 21,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  )
+                : Text(
+                    '${_selectedChannelIds.length} selected',
+                    style: FlutterFlowTheme.of(context).bodyMedium.override(
+                          fontFamily: 'Inter',
+                          fontSize: 21,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  );
           },
           backgroundColor: Colors.white,
         ),
@@ -190,21 +264,60 @@ class _ChannelListState extends State<ChannelList> {
           separatorBuilder: (context, channelList, channelIndex) {
             return const SizedBox(width: 0, height: 0);
           },
-          onChannelTap: (channel) async {
-            final members = await getMemberIds(channel);
-            // ignore: use_build_context_synchronously
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => StreamChannel(
-                  channel: channel,
-                  child: ChannelPage(
-                    selectedMembers: members,
-                  ),
-                ),
+          itemBuilder: (context, channels, index, defaultChannelListTile) {
+            final channel = channels[index];
+            return GestureDetector(
+              onTap: () async {
+                if (_isSelectionMode) {
+                  setState(() {
+                    if (_selectedChannelIds.contains(channel.id)) {
+                      _selectedChannelIds.remove(channel.id);
+                    } else {
+                      _selectedChannelIds.add(channel.id!);
+                    }
+                  });
+                  await updateCanDeleteStatus();
+                } else {
+                  final members = await getMemberIds(channel);
+                  // ignore: use_build_context_synchronously
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => StreamChannel(
+                        channel: channel,
+                        child: ChannelPage(
+                          selectedMembers: members,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+              },
+              child: Container(
+                color: _selectedChannelIds.contains(channel.id)
+                    ? Colors.blue[100]
+                    : null, // Highlight if selected
+                child: defaultChannelListTile,
               ),
             );
           },
+          // onChannelTap: (channel) async {
+          //   if (_isSelectionMode == false) {
+          // final members = await getMemberIds(channel);
+          // // ignore: use_build_context_synchronously
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (context) => StreamChannel(
+          //       channel: channel,
+          //       child: ChannelPage(
+          //         selectedMembers: members,
+          //       ),
+          //     ),
+          //   ),
+          // );
+          //   }
+          // },
         ),
       ),
     );
