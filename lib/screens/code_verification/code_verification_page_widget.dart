@@ -53,6 +53,7 @@ class _CodeVerificationPageWidgetState
   void initState() {
     super.initState();
     _model = createModel(context, () => CodeVerificationPageModel());
+    print(widget.verificationId);
 
     authManager.handlePhoneAuthStateChanges(context);
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
@@ -156,6 +157,8 @@ class _CodeVerificationPageWidgetState
     setState(() {
       _verificationId = widget.verificationId;
     });
+    print(widget.verificationId);
+    print(_verificationId);
     final credential = PhoneAuthProvider.credential(
       verificationId: _verificationId!,
       smsCode: otpCode,

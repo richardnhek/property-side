@@ -42,7 +42,7 @@ class _ChannelPageState extends State<ChannelPage> {
     Future<void> getOrCreateCall({List<String> memberIds = const []}) async {
       var callId = generateAlphanumericString(12);
 
-      unawaited(showLoadingIndicator(context));
+      // unawaited(showLoadingIndicator(context));
       _call = _streamVideo.makeCall(type: kCallType, id: callId);
 
       try {
@@ -56,7 +56,7 @@ class _ChannelPageState extends State<ChannelPage> {
       }
 
       if (mounted) {
-        hideLoadingIndicator(context);
+        // hideLoadingIndicator(context);
         LobbyRoute($extra: _call!).push(context);
       }
     }

@@ -46,7 +46,7 @@ GoRouter initRouter(UserAuthController authNotifier) {
             child: Scaffold(
                 body: child,
                 bottomNavigationBar: SizedBox(
-                  height: 75.0,
+                  height: 85.0,
                   child: BottomNavigationBar(
                     currentIndex: currentIndex,
                     onTap: (index) {

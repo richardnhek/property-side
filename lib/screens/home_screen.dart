@@ -64,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
     var callId = _callIdController.text;
     if (callId.isEmpty) callId = generateAlphanumericString(12);
 
-    unawaited(showLoadingIndicator(context));
+    // unawaited(showLoadingIndicator(context));
     _call = _streamVideo.makeCall(type: kCallType, id: callId);
 
     try {
@@ -78,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     if (mounted) {
-      hideLoadingIndicator(context);
+      // hideLoadingIndicator(context);
       LobbyRoute($extra: _call!).push(context);
     }
   }
