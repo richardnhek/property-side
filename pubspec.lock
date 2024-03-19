@@ -1717,6 +1717,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+  sticky_headers:
+    dependency: "direct main"
+    description:
+      name: sticky_headers
+      sha256: "9b3dd2cb0fd6a7038170af3261f855660cbb241cb56c501452cb8deed7023ede"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.0+2"
+  stop_watch_timer:
+    dependency: "direct main"
+    description:
+      name: stop_watch_timer
+      sha256: "9128717892ac94094e61544cb5259aff79eefebc0c4549a46d815689c56be8a7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.1"
   stream_channel:
     dependency: transitive
     description:

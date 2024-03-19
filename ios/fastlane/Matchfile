@@ -1,8 +1,8 @@
-git_url("git@github.com:GetStream/ios-certificates.git")
+git_url("git@github.com:richardnhek/property-side.git")
 
 storage_mode("git")
 
 type("appstore") # The default type, can be: appstore, adhoc, enterprise or development
 
-app_identifier(["io.getstream.video.flutter.dogfooding"])
+app_identifier(["com.propertyside.clientapp"])
 # username("user@fastlane.tools") # Your Apple Developer Portal username

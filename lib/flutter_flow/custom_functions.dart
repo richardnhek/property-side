@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math' as math;
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -121,4 +122,29 @@ String? getUserInitial(String? userFullName) {
   return userFullName[0];
 
   /// MODIFY CODE ONLY ABOVE THIS LINE
+}
+
+Future<UsersRecord?> fetchUserRecord() async {
+  final User? firebaseUser = FirebaseAuth.instance.currentUser;
+  if (firebaseUser != null) {
+    final String uid = firebaseUser.uid;
+    // Fetch the user document from Firestore
+    final DocumentSnapshot userDocSnapshot =
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+    if (userDocSnapshot.exists) {
+      // Create a UsersRecord instance from the Firestore document
+      Map<String, dynamic> data =
+          userDocSnapshot.data() as Map<String, dynamic>;
+      UsersRecord userRecord =
+          UsersRecord.getDocumentFromData(data, userDocSnapshot.reference);
+      return userRecord;
+    } else {
+      print("User document does not exist in Firestore.");
+      return null;
+    }
+  } else {
+    print("No FirebaseAuth user is currently signed in.");
+    return null;
+  }
 }

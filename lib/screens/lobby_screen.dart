@@ -26,17 +26,6 @@ class LobbyScreen extends StatelessWidget {
         cardBackgroundColor: const Color(0xFF4C525C),
       ),
       child: StreamLobbyView(
-        onCloseTap: () {
-          if (Navigator.of(context).canPop()) {
-            // ignore: use_build_context_synchronously
-            context.pop();
-          }
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ChannelList(),
-              ));
-        },
         call: call,
         onJoinCallPressed: onJoinCallPressed,
       ),

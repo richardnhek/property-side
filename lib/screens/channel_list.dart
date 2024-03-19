@@ -27,6 +27,12 @@ class _ChannelListState extends State<ChannelList> {
   OwnUser? currentChatUser;
   late final AppPreferences prefs;
   late final UserCredentials credentials;
+  List<String> _selectedChannelIds = [];
+  bool _isSelectionMode = false;
+  bool _canDeleteSelectedChannels = false;
+  bool _isCheckingDeletable = false;
+  String _searchQuery = '';
+  late TextEditingController _searchController;
 
   @override
   void initState() {
@@ -38,12 +44,65 @@ class _ChannelListState extends State<ChannelList> {
     prefs = locator.get<AppPreferences>();
     credentials = prefs.userCredentials!;
     currentChatUser = OwnUser(id: credentials.userInfo.id);
+    _searchController = TextEditingController();
     _listController = StreamChannelListController(
       client: client,
       filter: filterStream.Filter.in_('members', [currentChatUser!.id]),
       channelStateSort: const [SortOption('last_message_at')],
       limit: 20,
     );
+  }
+
+  Future<void> deleteSelectedChannels() async {
+    for (String channelId in _selectedChannelIds) {
+      final channel = client.channel('messaging', id: channelId);
+      await channel.delete();
+    }
+    setState(() {
+      _selectedChannelIds.clear(); // Clear selection after deletion
+    });
+    // Optionally, refresh your channel list here if necessary
+  }
+
+  void _updateListController() {
+    filterStream.Filter filter;
+    if (_searchQuery.isNotEmpty) {
+      filter = filterStream.Filter.and([
+        filterStream.Filter.in_('members', [currentChatUser!.id]),
+        filterStream.Filter.equal('name', _searchQuery)
+      ]);
+    } else {
+      filter = filterStream.Filter.in_('members', [currentChatUser!.id]);
+    }
+
+    _listController = StreamChannelListController(
+      client: client,
+      filter: filter,
+      channelStateSort: const [SortOption('last_message_at')],
+      limit: 20,
+    );
+
+    // Force widget to rebuild with new controller
+    setState(() {});
+  }
+
+  Future<void> updateCanDeleteStatus() async {
+    setState(() {
+      _isCheckingDeletable = true;
+    });
+    bool canDelete = true;
+    for (String channelId in _selectedChannelIds) {
+      final channel = client.channel('messaging', id: channelId);
+      final response = await channel.queryMembers();
+      if (response.members.length > 2) {
+        canDelete = false;
+        break;
+      }
+    }
+    setState(() {
+      _canDeleteSelectedChannels = canDelete;
+      _isCheckingDeletable = false;
+    });
   }
 
   void connectChatUser() async {
@@ -110,284 +169,230 @@ class _ChannelListState extends State<ChannelList> {
       data: StreamChatThemeData.light().copyWith(
           channelListHeaderTheme: const StreamChannelListHeaderThemeData()
               .copyWith(color: Colors.white)),
-      child: Scaffold(
-        appBar: StreamChannelListHeader(
-          client: client,
-          centerTitle: true,
-          elevation: 0,
-          actions: [
-            InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ContactsPage()),
-                );
-              },
-              child: Container(
-                width: 27,
-                height: 27,
-                margin: EdgeInsets.only(right: 10),
-                decoration: BoxDecoration(
-                  color: FlutterFlowTheme.of(context).primary,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.transparent,
-                    width: 0,
-                  ),
-                ),
-                child: Align(
-                  alignment: AlignmentDirectional(0, 0),
-                  child: Icon(
-                    Icons.add_rounded,
-                    color: FlutterFlowTheme.of(context).primaryBackground,
-                    size: 24,
-                  ),
-                ),
-              ),
-            ),
-          ],
-          leading: Center(
-            child: Container(
-              width: 27,
-              height: 27,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: FlutterFlowTheme.of(context).primary,
-                  width: 1.5,
-                ),
-              ),
-              child: Align(
-                alignment: AlignmentDirectional(0, 0),
-                child: Icon(
-                  Icons.keyboard_control_rounded,
-                  color: FlutterFlowTheme.of(context).primary,
-                  size: 24,
-                ),
-              ),
-            ),
-          ),
-          titleBuilder: (context, status, client) {
-            return Container(
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-              ),
-              child: Text(
-                'Chats',
-                style: FlutterFlowTheme.of(context).bodyMedium.override(
-                      fontFamily: 'Inter',
-                      fontSize: 21,
-                      fontWeight: FontWeight.w600,
+      child: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: Scaffold(
+          appBar: StreamChannelListHeader(
+            client: client,
+            centerTitle: true,
+            elevation: 0,
+            actions: [
+              if (_selectedChannelIds.isNotEmpty)
+                _isCheckingDeletable
+                    ? const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10.0),
+                        child: SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.grey, // or any other color
+                            ),
+                          ),
+                        ),
+                      )
+                    : IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: _selectedChannelIds.isNotEmpty &&
+                                _canDeleteSelectedChannels
+                            ? () {
+                                // Your existing deletion confirmation logic
+                              }
+                            : null, // Disable button if deletion is not allowed
+                      ),
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ContactsPage()),
+                  );
+                },
+                child: Container(
+                  width: 27,
+                  height: 27,
+                  margin: EdgeInsets.only(right: 10),
+                  decoration: BoxDecoration(
+                    color: FlutterFlowTheme.of(context).primary,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.transparent,
+                      width: 0,
                     ),
-              ),
-            );
-          },
-          backgroundColor: Colors.white,
-        ),
-        backgroundColor: Colors.white,
-        body: StreamChannelListView(
-          controller: _listController!,
-          separatorBuilder: (context, channelList, channelIndex) {
-            return const SizedBox(width: 0, height: 0);
-          },
-          // itemBuilder: (context, channelList, channelIndex, channelListTile) {
-          //   final channel = channelList[channelIndex];
-          //   final channelName = channel.name;
-          //   final lastMessage =
-          //       channel.state?.messages.last.text ?? 'No messages yet';
-          //   final lastMessageTime =
-          //       channel.state?.messages.last.createdAt ?? DateTime.now();
-
-          //   return InkWell(
-          //     onTap: () async {
-          //       final members = await getMemberIds(channel);
-          //       // ignore: use_build_context_synchronously
-          //       Navigator.push(
-          //         context,
-          //         MaterialPageRoute(
-          //           builder: (context) => StreamChannel(
-          //             channel: channel,
-          //             child: ChannelPage(
-          //               selectedMembers: members,
-          //             ),
-          //           ),
-          //         ),
-          //       );
-          //     },
-          //     child: Container(
-          //       width: double.infinity,
-          //       height: 75,
-          //       decoration: BoxDecoration(
-          //         color: Colors.transparent,
-          //       ),
-          //       child: Padding(
-          //         padding: EdgeInsetsDirectional.fromSTEB(20, 0, 15, 0),
-          //         child: Row(
-          //           mainAxisSize: MainAxisSize.max,
-          //           children: [
-          //             Row(
-          //               mainAxisSize: MainAxisSize.max,
-          //               children: [
-          //                 Container(
-          //                     width: 50,
-          //                     height: 50,
-          //                     clipBehavior: Clip.antiAlias,
-          //                     decoration: const BoxDecoration(
-          //                       shape: BoxShape.circle,
-          //                     ),
-          //                     child: StreamChannelAvatar(
-          //                       channel: channel,
-          //                       constraints: const BoxConstraints(
-          //                           maxHeight: 50, maxWidth: 50),
-          //                     )),
-          //               ],
-          //             ),
-          //             Expanded(
-          //               child: Column(
-          //                 mainAxisSize: MainAxisSize.max,
-          //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //                 children: [
-          //                   Padding(
-          //                     padding:
-          //                         EdgeInsetsDirectional.fromSTEB(0, 15, 0, 0),
-          //                     child: Row(
-          //                       mainAxisSize: MainAxisSize.max,
-          //                       mainAxisAlignment:
-          //                           MainAxisAlignment.spaceBetween,
-          //                       crossAxisAlignment: CrossAxisAlignment.start,
-          //                       children: [
-          //                         Align(
-          //                           alignment: AlignmentDirectional(-1, -1),
-          //                           child: Column(
-          //                             mainAxisSize: MainAxisSize.max,
-          //                             crossAxisAlignment:
-          //                                 CrossAxisAlignment.start,
-          //                             children: [
-          //                               StreamChannelName(
-          //                                 channel: channel,
-          //                                 textOverflow: TextOverflow.ellipsis,
-          //                                 textStyle:
-          //                                     FlutterFlowTheme.of(context)
-          //                                         .bodyMedium
-          //                                         .override(
-          //                                           fontFamily: 'Inter',
-          //                                           fontSize: 15,
-          //                                           fontWeight: FontWeight.w600,
-          //                                           lineHeight: 1,
-          //                                         ),
-          //                               ),
-          //                               RichText(
-          //                                 textScaleFactor:
-          //                                     MediaQuery.of(context)
-          //                                         .textScaleFactor,
-          //                                 text: TextSpan(
-          //                                   children: [
-          //                                     TextSpan(
-          //                                       text: channel.state?.messages
-          //                                                   .last.user?.id ==
-          //                                               credentials.userInfo.id
-          //                                           ? ''
-          //                                           : "${channel.state?.messages.last.user?.name}: " ??
-          //                                               'Alex: ',
-          //                                       style:
-          //                                           FlutterFlowTheme.of(context)
-          //                                               .bodyMedium
-          //                                               .override(
-          //                                                 fontFamily: 'Inter',
-          //                                                 color: FlutterFlowTheme
-          //                                                         .of(context)
-          //                                                     .darkGrey4,
-          //                                                 fontWeight:
-          //                                                     FontWeight.w600,
-          //                                                 lineHeight: 1,
-          //                                               ),
-          //                                     ),
-          //                                     TextSpan(
-          //                                       text: lastMessage ?? 'Awesome!',
-          //                                       style: GoogleFonts.getFont(
-          //                                         'Inter',
-          //                                         color: FlutterFlowTheme.of(
-          //                                                 context)
-          //                                             .darkGrey4,
-          //                                         fontSize: 14,
-          //                                         height: 1,
-          //                                       ),
-          //                                     )
-          //                                   ],
-          //                                 ),
-          //                               ),
-          //                             ],
-          //                           ),
-          //                         ),
-          //                         Column(
-          //                           mainAxisSize: MainAxisSize.max,
-          //                           children: [
-          //                             Text(
-          //                               formatCreatedAt(channel
-          //                                   .state!.messages.last.createdAt),
-          //                               style: FlutterFlowTheme.of(context)
-          //                                   .bodyMedium
-          //                                   .override(
-          //                                     fontFamily: 'Inter',
-          //                                     color:
-          //                                         FlutterFlowTheme.of(context)
-          //                                             .darkGrey3,
-          //                                     lineHeight: 1,
-          //                                   ),
-          //                             ),
-          //                           ],
-          //                         ),
-          //                       ],
-          //                     ),
-          //                   ),
-          //                   Divider(
-          //                     height: 0,
-          //                     thickness: 1,
-          //                     color: FlutterFlowTheme.of(context).lineColor,
-          //                   ),
-          //                 ],
-          //               ),
-          //             ),
-          //           ],
-          //         ),
-          //       ),
-          //     ),
-          //   );
-          // },
-          onChannelTap: (channel) async {
-            final members = await getMemberIds(channel);
-            // ignore: use_build_context_synchronously
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => StreamChannel(
-                  channel: channel,
-                  child: ChannelPage(
-                    selectedMembers: members,
+                  ),
+                  child: Align(
+                    alignment: AlignmentDirectional(0, 0),
+                    child: Icon(
+                      Icons.add_rounded,
+                      color: FlutterFlowTheme.of(context).primaryBackground,
+                      size: 24,
+                    ),
                   ),
                 ),
               ),
-            );
-          },
+            ],
+            leading: Center(
+              child: InkWell(
+                onTap: () {
+                  setState(() {
+                    _isSelectionMode = !_isSelectionMode;
+                    if (!_isSelectionMode) {
+                      _selectedChannelIds
+                          .clear(); // Clear selections when leaving selection mode
+                    }
+                  });
+                },
+                child: Container(
+                  width: 27,
+                  height: 27,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: FlutterFlowTheme.of(context).primary,
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Align(
+                    alignment: AlignmentDirectional(0, 0),
+                    child: Icon(
+                      _isSelectionMode
+                          ? Icons.close
+                          : Icons.keyboard_control_rounded,
+                      color: FlutterFlowTheme.of(context).primary,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            titleBuilder: (context, status, client) {
+              return !_isSelectionMode
+                  ? Text(
+                      'Chats',
+                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                            fontFamily: 'Inter',
+                            fontSize: 21,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    )
+                  : Text(
+                      '${_selectedChannelIds.length} selected',
+                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                            fontFamily: 'Inter',
+                            fontSize: 21,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    );
+            },
+            backgroundColor: Colors.white,
+          ),
+          backgroundColor: Colors.white,
+          body: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 10.0, vertical: 20.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(12.0)),
+                      border: Border.all(
+                          color: FlutterFlowTheme.of(context).darkGrey2,
+                          width: 2.0)),
+                  height: 60.0,
+                  child: Center(
+                    child: TextField(
+                      controller: _searchController,
+                      style: GoogleFonts.inter(
+                          fontSize: 14.0,
+                          color: FlutterFlowTheme.of(context).primaryText),
+                      cursorColor: Colors.red,
+                      decoration: const InputDecoration(
+                          hintText: 'Search for chats...',
+                          prefixIcon: Icon(Icons.search),
+                          focusedBorder: InputBorder.none),
+                      onChanged: (value) {
+                        setState(() {
+                          _searchQuery = value;
+                          _updateListController();
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: StreamChannelListView(
+                  controller: _listController!,
+                  separatorBuilder: (context, channelList, channelIndex) {
+                    return Divider(
+                        color: FlutterFlowTheme.of(context).darkGrey3,
+                        indent: 10.0,
+                        endIndent: 10.0,
+                        height: 10);
+                  },
+                  itemBuilder:
+                      (context, channels, index, defaultChannelListTile) {
+                    final channel = channels[index];
+                    return InkWell(
+                      onTap: () async {
+                        if (_isSelectionMode) {
+                          setState(() {
+                            if (_selectedChannelIds.contains(channel.id)) {
+                              _selectedChannelIds.remove(channel.id);
+                            } else {
+                              _selectedChannelIds.add(channel.id!);
+                            }
+                          });
+                          await updateCanDeleteStatus();
+                        } else {
+                          final members = await getMemberIds(channel);
+                          // ignore: use_build_context_synchronously
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => StreamChannel(
+                                channel: channel,
+                                child: ChannelPage(
+                                  selectedMembers: members,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: Container(
+                        color: _selectedChannelIds.contains(channel.id)
+                            ? Colors.blue[100]
+                            : null, // Highlight if selected
+                        child: defaultChannelListTile,
+                      ),
+                    );
+                  },
+                  // onChannelTap: (channel) async {
+                  //   if (_isSelectionMode == false) {
+                  // final members = await getMemberIds(channel);
+                  // // ignore: use_build_context_synchronously
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => StreamChannel(
+                  //       channel: channel,
+                  //       child: ChannelPage(
+                  //         selectedMembers: members,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // );
+                  //   }
+                  // },
+                ),
+              ),
+            ],
+          ),
         ),
-        // body: StreamChannelListView(
-        //   controller: _listController!,
-        //   onChannelTap: (channel) async {
-        //     final members = await getMemberIds(channel);
-        //     // ignore: use_build_context_synchronously
-        //     Navigator.push(
-        //       context,
-        //       MaterialPageRoute(
-        //         builder: (context) => StreamChannel(
-        //           channel: channel,
-        //           child: ChannelPage(
-        //             selectedMembers: members,
-        //           ),
-        //         ),
-        //       ),
-        //     );
-        //   },
-        // ),
       ),
     );
   }
@@ -395,6 +400,7 @@ class _ChannelListState extends State<ChannelList> {
   @override
   void dispose() {
     _listController?.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 }

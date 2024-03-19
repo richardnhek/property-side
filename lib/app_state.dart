@@ -52,6 +52,12 @@ class FFAppState extends ChangeNotifier {
     _currentMainView = value;
   }
 
+  bool _showBottomNav = true;
+  bool get showBottomNav => _showBottomNav;
+  set showBottomNav(bool value) {
+    _showBottomNav = value;
+  }
+
   DocumentReference? _selectedMembers;
   DocumentReference? get selectedMembers => _selectedMembers;
   set selectedMembers(DocumentReference? value) {

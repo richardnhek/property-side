@@ -2,6 +2,8 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebaseAuth;
 import 'package:flutter/material.dart';
 import 'package:flutter_dogfooding/screens/channel_list.dart';
+import 'package:flutter_dogfooding/screens/profile/profile_widget.dart';
+import 'package:flutter_dogfooding/screens/team/team_widget.dart';
 
 // 📦 Package imports:
 import 'package:go_router/go_router.dart';
@@ -15,6 +17,8 @@ import 'package:flutter_dogfooding/screens/lobby_screen.dart';
 import '../core/repos/app_preferences.dart';
 import '../core/repos/token_service.dart';
 import '../di/injector.dart';
+import '../screens/channel_screen.dart';
+import '../screens/code_verification/code_verification_page_widget.dart';
 import '../screens/home_property/home_property_widget.dart';
 import '../screens/login_screen.dart';
 import '../screens/new_login/new_login_widget.dart';
@@ -22,7 +26,7 @@ import '../screens/new_login/new_login_widget.dart';
 part 'routes.g.dart';
 
 @immutable
-@TypedGoRoute<HomeRoute>(path: '/', name: 'home')
+@TypedGoRoute<HomeRoute>(path: '/home', name: 'home')
 class HomeRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
@@ -69,7 +73,22 @@ class ChannelListRoute extends GoRouteData {
 }
 
 @immutable
-@TypedGoRoute<ChannelListRoute>(path: '/homeProperty', name: 'homeProperty')
+@TypedGoRoute<ChannelPageRoute>(path: '/channel', name: 'channel')
+class ChannelPageRoute extends GoRouteData {
+  const ChannelPageRoute({required this.selectedMembers});
+
+  final List<String?> selectedMembers;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return ChannelPage(
+      selectedMembers: selectedMembers,
+    );
+  }
+}
+
+@immutable
+@TypedGoRoute<HomePropertyRoute>(path: '/homeProperty', name: 'homeProperty')
 class HomePropertyRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
@@ -78,13 +97,45 @@ class HomePropertyRoute extends GoRouteData {
 }
 
 @immutable
-@TypedGoRoute<LoginRoute>(path: '/login', name: 'login')
+@TypedGoRoute<ProfileRoute>(path: '/profile', name: 'profile')
+class ProfileRoute extends GoRouteData {
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const ProfileWidget();
+  }
+}
+
+@immutable
+@TypedGoRoute<TeamRoute>(path: '/team', name: 'team')
+class TeamRoute extends GoRouteData {
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const TeamWidget();
+  }
+}
+
+@immutable
+@TypedGoRoute<LoginRoute>(path: '/', name: 'login')
 class LoginRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    final firebaseAuth.FirebaseAuth auth = firebaseAuth.FirebaseAuth.instance;
-    final firebaseAuth.User? user = auth.currentUser;
-    return user != null ? const LoginScreen() : const NewLoginScreen();
+    return const NewLoginScreen();
+  }
+}
+
+@immutable
+@TypedGoRoute<OTPRoute>(path: '/codeVerification', name: 'codeVerification')
+class OTPRoute extends GoRouteData {
+  const OTPRoute({required this.phoneNumber, required this.verificationId});
+
+  final String? phoneNumber;
+  final String? verificationId;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    // Correctly return the widget for OTP verification, passing parameters as needed
+    return CodeVerificationPageWidget(
+        phoneNumber: phoneNumber, verificationId: verificationId);
   }
 }
 
