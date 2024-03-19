@@ -92,7 +92,7 @@ GoRouter initRouter(UserAuthController authNotifier) {
                                 Icons.developer_mode,
                                 size: 18.0,
                               ),
-                              label: 'Dev',
+                              label: 'Beta',
                               tooltip: '',
                             ),
                             BottomNavigationBarItem(

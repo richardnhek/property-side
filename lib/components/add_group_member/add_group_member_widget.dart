@@ -81,7 +81,7 @@ class _AddGroupMemberWidgetState extends State<AddGroupMemberWidget> {
               overlapHeaders: false,
               header: Container(
                 width: double.infinity,
-                height: 50,
+                height: 60,
                 decoration: BoxDecoration(
                   color: FlutterFlowTheme.of(context).secondaryBackground,
                   borderRadius: BorderRadius.only(
@@ -92,7 +92,7 @@ class _AddGroupMemberWidgetState extends State<AddGroupMemberWidget> {
                   ),
                 ),
                 child: Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(20, 0, 20, 0),
+                  padding: EdgeInsetsDirectional.fromSTEB(20, 20, 20, 20),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -134,8 +134,28 @@ class _AddGroupMemberWidgetState extends State<AddGroupMemberWidget> {
                             ),
                       ),
                       InkWell(
-                        onTap: selectedUserIds.isEmpty
-                            ? null
+                        onTap: selectedUserIds.isEmpty ||
+                                selectedUserIds.length < 2
+                            ? () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Please select at least 2 members',
+                                      style: GoogleFonts.getFont(
+                                        'Inter',
+                                        color: FlutterFlowTheme.of(context)
+                                            .secondary,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 15.0,
+                                      ),
+                                    ),
+                                    duration:
+                                        const Duration(milliseconds: 4000),
+                                    backgroundColor:
+                                        FlutterFlowTheme.of(context).darkGrey,
+                                  ),
+                                );
+                              }
                             : () async {
                                 final prefs = locator.get<AppPreferences>();
                                 final credentials = prefs.userCredentials;

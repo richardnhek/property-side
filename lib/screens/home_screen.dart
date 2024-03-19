@@ -159,12 +159,23 @@ class _HomeScreenState extends State<HomeScreen> {
           ));
     }
 
-    return Center(
-      child: SizedBox(
-        child: Text(
-          "PropertySide Beta 1.0.0",
-          style: GoogleFonts.inter(
-              fontSize: 18.0, color: Colors.grey, fontWeight: FontWeight.w500),
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).requestFocus(FocusNode());
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: SizedBox(
+            child: Text(
+              "PropertySide Beta 1.0.0",
+              style: GoogleFonts.inter(
+                fontSize: 18.0,
+                color: Colors.grey,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
         ),
       ),
     );
