@@ -256,7 +256,7 @@ class _TeamWidgetState extends State<TeamWidget> {
                       alignment: AlignmentDirectional(-1, -1),
                       child: StreamBuilder<List<Map<String, dynamic>>>(
                         stream:
-                            fetchSubteamUserDetails(currentUserId!, "Personal"),
+                            fetchSubteamUserDetails(currentUserId!, "PERSONAL"),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return CircularProgressIndicator(
@@ -358,7 +358,7 @@ class _TeamWidgetState extends State<TeamWidget> {
                       alignment: AlignmentDirectional(-1, -1),
                       child: StreamBuilder<List<Map<String, dynamic>>>(
                         stream:
-                            fetchSubteamUserDetails(currentUserId!, "Finance"),
+                            fetchSubteamUserDetails(currentUserId!, "FINANCE"),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return CircularProgressIndicator(
@@ -459,8 +459,8 @@ class _TeamWidgetState extends State<TeamWidget> {
                     Align(
                         alignment: AlignmentDirectional(-1, -1),
                         child: StreamBuilder<List<Map<String, dynamic>>>(
-                          stream: fetchSubteamUserDetails(
-                              currentUserId!, "Finance"),
+                          stream:
+                              fetchSubteamUserDetails(currentUserId!, "BUYING"),
                           builder: (context, snapshot) {
                             if (!snapshot.hasData) {
                               return CircularProgressIndicator(

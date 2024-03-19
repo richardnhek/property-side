@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:math' as Math;
 
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dogfooding/backend/backend.dart';
 import 'package:flutter_dogfooding/screens/code_verification/code_verification_page_widget.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart' as strChat;
@@ -279,7 +281,8 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                                                                     FontWeight
                                                                         .w600,
                                                               ),
-                                                      hintText: '(555) 000-000',
+                                                      hintText:
+                                                          '+61 ### ### ###',
                                                       hintStyle:
                                                           FlutterFlowTheme.of(
                                                                   context)
@@ -364,7 +367,9 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                                                         .phoneNumberControllerValidator
                                                         .asValidator(context),
                                                     inputFormatters: [
-                                                      _model.phoneNumberMask
+                                                      AustralianPhoneInputFormatter(),
+                                                      LengthLimitingTextInputFormatter(
+                                                          15), // Limiting length including country code
                                                     ],
                                                   ),
                                                 ),
@@ -456,6 +461,59 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class AustralianPhoneInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    String newText = newValue.text;
+    // Return directly if user is deleting and manage deletion to avoid format issues
+    if (newValue.text.length < oldValue.text.length) {
+      if (oldValue.text.endsWith(" 0") &&
+          newValue.text.length + 1 == oldValue.text.length) {
+        // Handle specific case where user backspaces the "0" after "+61 "
+        return newValue.copyWith(
+            text:
+                newValue.text.substring(0, newValue.text.length - 3) + "+61 ");
+      }
+      return newValue;
+    }
+    // Remove all non-digit characters
+    newText = newText.replaceAll(RegExp(r'\D'), '');
+
+    String formattedString = '+61';
+    if (newText.startsWith('61')) {
+      newText = newText.substring(2); // Remove '61' if it's part of the input
+    }
+
+    // Applying logic for temporary leading zero visibility
+    if (newText.startsWith('0') && newText.length == 1) {
+      // Keep the "0" if it's the only digit entered after "+61"
+    } else if (newText.startsWith('0')) {
+      // Remove the leading "0" for any subsequent digit entry
+      newText = newText.substring(1);
+    }
+
+    // Formatting the rest of the phone number after handling the leading "0"
+    if (newText.length > 0) {
+      formattedString +=
+          ' ' + newText.substring(0, Math.min(3, newText.length));
+    }
+    if (newText.length > 3) {
+      formattedString +=
+          ' ' + newText.substring(3, Math.min(6, newText.length));
+    }
+    if (newText.length > 6) {
+      formattedString +=
+          ' ' + newText.substring(6, Math.min(9, newText.length));
+    }
+
+    return TextEditingValue(
+      text: formattedString,
+      selection: TextSelection.collapsed(offset: formattedString.length),
     );
   }
 }

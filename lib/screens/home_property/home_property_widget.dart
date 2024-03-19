@@ -97,133 +97,133 @@ class _HomePropertyState extends State<HomeProperty> {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(
-                      25.0, 0.0, 25.0, 15.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          setState(() {
-                            _model.selectedSite =
-                                'https://www.realestate.com.au/';
-                          });
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Please wait, loading site: ${_model.selectedSite}',
-                                style: GoogleFonts.getFont(
-                                  'Inter',
-                                  color: FlutterFlowTheme.of(context).secondary,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 15.0,
-                                ),
-                              ),
-                              duration: const Duration(milliseconds: 4000),
-                              backgroundColor:
-                                  FlutterFlowTheme.of(context).darkGrey,
-                            ),
-                          );
-                        },
-                        child: Material(
-                          color: Colors.transparent,
-                          elevation: 3.0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Container(
-                            width: 120.0,
-                            height: 40.0,
-                            decoration: BoxDecoration(
-                              color:
-                                  FlutterFlowTheme.of(context).primaryBtnText,
-                              borderRadius: BorderRadius.circular(8.0),
-                              border: Border.all(
-                                color: Colors.transparent,
-                                width: 0.0,
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  10.0, 0.0, 10.0, 0.0),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(0.0),
-                                child: Image.asset(
-                                  'assets/rea-logo.png',
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          setState(() {
-                            _model.selectedSite = 'https://listingloop.com.au/';
-                          });
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Please wait, loading site: ${_model.selectedSite}',
-                                style: GoogleFonts.getFont(
-                                  'Inter',
-                                  color: FlutterFlowTheme.of(context).secondary,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 15.0,
-                                ),
-                              ),
-                              duration: const Duration(milliseconds: 4000),
-                              backgroundColor:
-                                  FlutterFlowTheme.of(context).darkGrey,
-                            ),
-                          );
-                        },
-                        child: Material(
-                          color: Colors.transparent,
-                          elevation: 3.0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Container(
-                            width: 120.0,
-                            height: 40.0,
-                            decoration: BoxDecoration(
-                              color:
-                                  FlutterFlowTheme.of(context).primaryBtnText,
-                              borderRadius: BorderRadius.circular(8.0),
-                              border: Border.all(
-                                color: Colors.transparent,
-                                width: 0.0,
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  10.0, 0.0, 10.0, 0.0),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(0.0),
-                                child: Image.asset(
-                                  'assets/listingloop.png',
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // Padding(
+                //   padding: const EdgeInsetsDirectional.fromSTEB(
+                //       25.0, 0.0, 25.0, 15.0),
+                //   child: Row(
+                //     mainAxisSize: MainAxisSize.max,
+                //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //     children: [
+                //       InkWell(
+                //         splashColor: Colors.transparent,
+                //         focusColor: Colors.transparent,
+                //         hoverColor: Colors.transparent,
+                //         highlightColor: Colors.transparent,
+                //         onTap: () async {
+                //           setState(() {
+                //             _model.selectedSite =
+                //                 'https://www.realestate.com.au/';
+                //           });
+                //           ScaffoldMessenger.of(context).showSnackBar(
+                //             SnackBar(
+                //               content: Text(
+                //                 'Please wait, loading site: ${_model.selectedSite}',
+                //                 style: GoogleFonts.getFont(
+                //                   'Inter',
+                //                   color: FlutterFlowTheme.of(context).secondary,
+                //                   fontWeight: FontWeight.w500,
+                //                   fontSize: 15.0,
+                //                 ),
+                //               ),
+                //               duration: const Duration(milliseconds: 4000),
+                //               backgroundColor:
+                //                   FlutterFlowTheme.of(context).darkGrey,
+                //             ),
+                //           );
+                //         },
+                //         child: Material(
+                //           color: Colors.transparent,
+                //           elevation: 3.0,
+                //           shape: RoundedRectangleBorder(
+                //             borderRadius: BorderRadius.circular(8.0),
+                //           ),
+                //           child: Container(
+                //             width: 120.0,
+                //             height: 40.0,
+                //             decoration: BoxDecoration(
+                //               color:
+                //                   FlutterFlowTheme.of(context).primaryBtnText,
+                //               borderRadius: BorderRadius.circular(8.0),
+                //               border: Border.all(
+                //                 color: Colors.transparent,
+                //                 width: 0.0,
+                //               ),
+                //             ),
+                //             child: Padding(
+                //               padding: const EdgeInsetsDirectional.fromSTEB(
+                //                   10.0, 0.0, 10.0, 0.0),
+                //               child: ClipRRect(
+                //                 borderRadius: BorderRadius.circular(0.0),
+                //                 child: Image.asset(
+                //                   'assets/rea-logo.png',
+                //                   fit: BoxFit.contain,
+                //                 ),
+                //               ),
+                //             ),
+                //           ),
+                //         ),
+                //       ),
+                //       InkWell(
+                //         splashColor: Colors.transparent,
+                //         focusColor: Colors.transparent,
+                //         hoverColor: Colors.transparent,
+                //         highlightColor: Colors.transparent,
+                //         onTap: () async {
+                //           setState(() {
+                //             _model.selectedSite = 'https://listingloop.com.au/';
+                //           });
+                //           ScaffoldMessenger.of(context).showSnackBar(
+                //             SnackBar(
+                //               content: Text(
+                //                 'Please wait, loading site: ${_model.selectedSite}',
+                //                 style: GoogleFonts.getFont(
+                //                   'Inter',
+                //                   color: FlutterFlowTheme.of(context).secondary,
+                //                   fontWeight: FontWeight.w500,
+                //                   fontSize: 15.0,
+                //                 ),
+                //               ),
+                //               duration: const Duration(milliseconds: 4000),
+                //               backgroundColor:
+                //                   FlutterFlowTheme.of(context).darkGrey,
+                //             ),
+                //           );
+                //         },
+                //         child: Material(
+                //           color: Colors.transparent,
+                //           elevation: 3.0,
+                //           shape: RoundedRectangleBorder(
+                //             borderRadius: BorderRadius.circular(8.0),
+                //           ),
+                //           child: Container(
+                //             width: 120.0,
+                //             height: 40.0,
+                //             decoration: BoxDecoration(
+                //               color:
+                //                   FlutterFlowTheme.of(context).primaryBtnText,
+                //               borderRadius: BorderRadius.circular(8.0),
+                //               border: Border.all(
+                //                 color: Colors.transparent,
+                //                 width: 0.0,
+                //               ),
+                //             ),
+                //             child: Padding(
+                //               padding: const EdgeInsetsDirectional.fromSTEB(
+                //                   10.0, 0.0, 10.0, 0.0),
+                //               child: ClipRRect(
+                //                 borderRadius: BorderRadius.circular(0.0),
+                //                 child: Image.asset(
+                //                   'assets/listingloop.png',
+                //                   fit: BoxFit.contain,
+                //                 ),
+                //               ),
+                //             ),
+                //           ),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
               ],
             ),
           ),
