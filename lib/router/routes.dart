@@ -22,6 +22,7 @@ import '../screens/code_verification/code_verification_page_widget.dart';
 import '../screens/home_property/home_property_widget.dart';
 import '../screens/login_screen.dart';
 import '../screens/new_login/new_login_widget.dart';
+import '../screens/thread_page.dart';
 
 part 'routes.g.dart';
 
@@ -83,6 +84,24 @@ class ChannelPageRoute extends GoRouteData {
   Widget build(BuildContext context, GoRouterState state) {
     return ChannelPage(
       selectedMembers: selectedMembers,
+    );
+  }
+}
+
+@immutable
+@TypedGoRoute<ThreadPageRoute>(path: '/thread', name: 'thread')
+class ThreadPageRoute extends GoRouteData {
+  const ThreadPageRoute(
+      {required this.parentMessage, required this.threadChannel});
+
+  final Message parentMessage;
+  final Channel threadChannel;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return ThreadPage(
+      parent: parentMessage,
+      channel: threadChannel,
     );
   }
 }

@@ -14,6 +14,7 @@ import '../router/routes.dart';
 import '../utils/consts.dart';
 import '../utils/loading_dialog.dart';
 import 'call_screen.dart';
+import 'thread_page.dart';
 
 class ChannelPage extends StatefulWidget {
   const ChannelPage({required this.selectedMembers, super.key});
@@ -29,6 +30,7 @@ class _ChannelPageState extends State<ChannelPage> {
   late final _streamVideo = locator.get<StreamVideo>();
   Call? _call;
   late List<String> memberList;
+  streamFlutter.Message? _replyMessage;
 
   @override
   void initState() {
@@ -41,16 +43,30 @@ class _ChannelPageState extends State<ChannelPage> {
 
   @override
   Widget build(BuildContext context) {
+    Future<void> sendJoinCallMessage(
+        streamFlutter.Channel channel, String callId) async {
+      final message = streamFlutter.Message(
+        text: 'Join Call',
+        extraData: {
+          'callId': callId,
+        },
+      );
+
+      try {
+        await channel.sendMessage(message);
+        debugPrint('Join call message sent successfully');
+      } catch (e) {
+        debugPrint('Error sending join call message: $e');
+      }
+    }
+
     Future<void> getOrCreateCall(
-        {List<String> memberIds = const [], String? specificCallType}) async {
+        {List<String> memberIds = const [],
+        String? specificCallType,
+        required streamFlutter.Channel channel}) async {
       var callId = generateAlphanumericString(12);
-
-      // Assume showLoadingIndicator(context) is to display a loading animation.
-      // unawaited(showLoadingIndicator(context)); // Uncomment or use according to your needs.
-
       _call = _streamVideo.makeCall(
-          type: specificCallType ?? kCallType,
-          id: callId); // Make sure 'kCallType' is defined or replace it with default call type.
+          type: specificCallType ?? kCallType, id: callId);
 
       try {
         await _call!.getOrCreate(
@@ -60,17 +76,19 @@ class _ChannelPageState extends State<ChannelPage> {
       } catch (e, stk) {
         debugPrint('Error joining or creating call: $e');
         debugPrint(stk.toString());
-        // If there's an error, ideally you should handle it, for example, by showing an error message.
-        return; // Return from the function if there was an error.
+        return;
       }
 
       if (mounted) {
-        // hideLoadingIndicator(context); // Uncomment or use according to your needs.
-
         CallConnectOptions connectOptions = CallConnectOptions(
             camera: TrackOption.disabled(),
             microphone: TrackOption.enabled(),
             screenShare: TrackOption.disabled());
+        try {
+          await sendJoinCallMessage(channel!, callId);
+        } catch (e) {
+          debugPrint('Error in messaging: $e');
+        }
 
         if (memberIds.length > 2) {
           LobbyRoute($extra: _call!).push(context);
@@ -98,7 +116,10 @@ class _ChannelPageState extends State<ChannelPage> {
                 InkWell(
                   onTap: () {
                     getOrCreateCall(
-                        memberIds: memberList, specificCallType: 'audio_room');
+                        memberIds: memberList,
+                        specificCallType: 'audio_room',
+                        channel:
+                            streamFlutter.StreamChannel.of(context).channel);
                   },
                   child: Icon(
                     Icons.call,
@@ -111,7 +132,10 @@ class _ChannelPageState extends State<ChannelPage> {
                 ),
                 InkWell(
                   onTap: () {
-                    getOrCreateCall(memberIds: memberList);
+                    getOrCreateCall(
+                        memberIds: memberList,
+                        channel:
+                            streamFlutter.StreamChannel.of(context).channel);
                   },
                   child: Icon(
                     Icons.video_camera_front_rounded,
@@ -124,10 +148,123 @@ class _ChannelPageState extends State<ChannelPage> {
           )
         ],
       ),
-      body: const Column(
+      body: Column(
         children: <Widget>[
-          Expanded(child: streamFlutter.StreamMessageListView()),
-          streamFlutter.StreamMessageInput(),
+          Expanded(child: streamFlutter.StreamMessageListView(
+            messageBuilder: (ctx, details, messages, defaultMessage) {
+              return defaultMessage.copyWith(
+                  showFlagButton: true,
+                  showEditMessage: details.isMyMessage,
+                  showCopyMessage: true,
+                  showDeleteMessage: details.isMyMessage,
+                  showThreadReplyMessage: true,
+                  onThreadTap: (message) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (ctx) => ThreadPage(
+                          parent: message,
+                          channel:
+                              streamFlutter.StreamChannel.of(context).channel,
+                        ),
+                      ),
+                    );
+                  },
+                  bottomRowBuilderWithDefaultWidget: (p0, p1, bottomRow) {
+                    final callId = p1.extraData["callId"];
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (callId != null)
+                          Padding(
+                            padding: details.isMyMessage
+                                ? EdgeInsets.only(right: 50)
+                                : EdgeInsets.only(right: 20),
+                            child: MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: GestureDetector(
+                                onTap: () async {
+                                  try {
+                                    final thisCall = _streamVideo.makeCall(
+                                        id: callId.toString(), type: kCallType);
+                                    await thisCall.getOrCreate();
+                                    LobbyRoute($extra: thisCall).push(context);
+                                  } catch (e, stk) {
+                                    debugPrint(
+                                        'Error joining or creating call: $e');
+                                    debugPrint(stk.toString());
+                                  }
+                                },
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: FlutterFlowTheme.of(context).primary,
+                                  ),
+                                  child: Icon(
+                                    Icons.video_camera_front_rounded,
+                                    size: 14,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        bottomRow.copyWith(
+                          message: p1,
+                          showThreadReplyIndicator: true,
+                          onThreadTap: (message) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (ctx) => ThreadPage(
+                                  parent: message,
+                                  channel:
+                                      streamFlutter.StreamChannel.of(context)
+                                          .channel,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    );
+                  });
+            },
+          )),
+          if (_replyMessage != null)
+            Container(
+              color: Colors.grey.shade200,
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Replying to: ${_replyMessage!.text}',
+                      style: TextStyle(color: Colors.black54),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () {
+                      setState(() {
+                        _replyMessage = null;
+                      });
+                    },
+                  )
+                ],
+              ),
+            ),
+          streamFlutter.StreamMessageInput(
+            preMessageSending: (message) async {
+              if (_replyMessage != null) {
+                message = message.copyWith(parentId: _replyMessage!.id);
+                _replyMessage = null;
+              }
+              return message;
+            },
+          ),
         ],
       ),
     );
