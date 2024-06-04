@@ -65,18 +65,18 @@ class _LoginScreenState extends State<LoginScreen> {
     return _login(User(info: userInfo));
   }
 
-  Future<void> _loginAsGuest() async {
-    final userId = randomId(size: 6);
-    final userInfo = UserInfo(
-      role: 'admin',
-      id: userId,
-      name: userId,
-      image:
-          'https://vignette.wikia.nocookie.net/starwars/images/2/20/LukeTLJ.jpg',
-    );
+  // Future<void> _loginAsGuest() async {
+  //   final userId = randomId(size: 6);
+  //   final userInfo = UserInfo(
+  //     role: 'admin',
+  //     id: userId,
+  //     name: userId,
+  //     image:
+  //         'https://vignette.wikia.nocookie.net/starwars/images/2/20/LukeTLJ.jpg',
+  //   );
 
-    return _login(User(info: userInfo, type: UserType.guest));
-  }
+  //   return _login(User(info: userInfo, type: UserType.guest));
+  // }
 
   Future<void> _login(User user) async {
     if (mounted) unawaited(showLoadingIndicator(context));
@@ -206,20 +206,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: GoogleLoginButton(
                     onPressed: _loginWithGoogle,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: TextButton(
-                    onPressed: _loginAsGuest,
-                    child: const Text(
-                      'Continue As Guest',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
                   ),
                 ),
               ],

@@ -48,12 +48,14 @@ class _CodeVerificationPageWidgetState
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
   String? _verificationId;
+  String? userId;
+  String? userName;
+  String? userImage;
 
   @override
   void initState() {
     super.initState();
     _model = createModel(context, () => CodeVerificationPageModel());
-    print(widget.verificationId);
 
     authManager.handlePhoneAuthStateChanges(context);
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
@@ -66,35 +68,8 @@ class _CodeVerificationPageWidgetState
     super.dispose();
   }
 
-  // Future<UsersRecord?> fetchUserRecord() async {
-  //   final User? firebaseUser = FirebaseAuth.instance.currentUser;
-  //   if (firebaseUser != null) {
-  //     final String uid = firebaseUser.uid;
-  //     // Fetch the user document from Firestore
-  //     final DocumentSnapshot userDocSnapshot =
-  //         await FirebaseFirestore.instance.collection('users').doc(uid).get();
-
-  //     if (userDocSnapshot.exists) {
-  //       // Create a UsersRecord instance from the Firestore document
-  //       Map<String, dynamic> data =
-  //           userDocSnapshot.data() as Map<String, dynamic>;
-  //       UsersRecord userRecord =
-  //           UsersRecord.getDocumentFromData(data, userDocSnapshot.reference);
-  //       return userRecord;
-  //     } else {
-  //       print("User document does not exist in Firestore.");
-  //       return null;
-  //     }
-  //   } else {
-  //     print("No FirebaseAuth user is currently signed in.");
-  //     return null;
-  //   }
-  // }
-
   Future<void> _loginWithPhoneNumber() async {
     final UsersRecord? thisUsersRecord = await functions.fetchUserRecord();
-    String userId;
-    String userName;
 
     // Generate a random string of 12 digits
     if (thisUsersRecord == null) {
@@ -105,16 +80,18 @@ class _CodeVerificationPageWidgetState
       final propertySideRandomName = 'buyer-name$randomNumbers';
       userId = propertySideRandomId;
       userName = propertySideRandomName;
+      userImage =
+          "https://cdn.iconscout.com/icon/free/png-256/free-profile-1481935-1254808.png";
     } else {
       userId = thisUsersRecord.uid;
       userName = thisUsersRecord.displayName;
+      userImage = thisUsersRecord.photoUrl.isEmpty
+          ? "https://cdn.iconscout.com/icon/free/png-256/free-profile-1481935-1254808.png"
+          : thisUsersRecord.photoUrl;
     }
 
     final userInfo = strVideo.UserInfo(
-      role: 'user',
-      id: userId,
-      name: userName,
-    );
+        role: 'user', id: userId!, name: userName!, image: userImage);
 
     return _login(strVideo.User(info: userInfo));
   }
@@ -142,8 +119,7 @@ class _CodeVerificationPageWidgetState
 
       await thisClient.connectUser(
         strChat.OwnUser(
-          id: credentials.userInfo.id,
-        ),
+            id: credentials.userInfo.id, name: userName, image: userImage),
         token,
       );
     } catch (error) {

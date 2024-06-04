@@ -223,7 +223,7 @@ class _AddGroupMemberWidgetState extends State<AddGroupMemberWidget> {
                               padding:
                                   EdgeInsetsDirectional.fromSTEB(20, 0, 0, 10),
                               child: Text(
-                                'Testing Members',
+                                'Team Members',
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
                                     .override(
@@ -347,199 +347,6 @@ class _AddGroupMemberWidgetState extends State<AddGroupMemberWidget> {
                         ],
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(0, 20, 0, 50),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Align(
-                            alignment: AlignmentDirectional(-1, -1),
-                            child: Padding(
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(20, 0, 0, 10),
-                              child: Text(
-                                'Current Members',
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      fontFamily: 'Inter',
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondaryText,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                              ),
-                            ),
-                          ),
-                          Material(
-                            color: Colors.transparent,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context)
-                                    .secondaryBackground,
-                                boxShadow: [
-                                  BoxShadow(
-                                    blurRadius: 6,
-                                    color: Color(0x14000000),
-                                    offset: Offset(0, 0),
-                                  )
-                                ],
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    20, 10, 20, 10),
-                                child: Builder(
-                                  builder: (context) {
-                                    final initialRUsers = _model.allUsers
-                                            ?.where((e) =>
-                                                functions.getUserInitial(
-                                                    e.displayName) ==
-                                                'R')
-                                            .toList()
-                                            ?.sortedList((e) => e.displayName)
-                                            ?.toList() ??
-                                        [];
-                                    return Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children:
-                                          List.generate(initialRUsers.length,
-                                              (initialRUsersIndex) {
-                                        final initialRUsersItem =
-                                            initialRUsers[initialRUsersIndex];
-                                        return Container(
-                                          width: double.infinity,
-                                          height: 50,
-                                          decoration: BoxDecoration(),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Container(
-                                                width: 40,
-                                                height: 40,
-                                                clipBehavior: Clip.antiAlias,
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                ),
-                                                child: CachedNetworkImage(
-                                                  fadeInDuration: Duration(
-                                                      milliseconds: 500),
-                                                  fadeOutDuration: Duration(
-                                                      milliseconds: 500),
-                                                  imageUrl: initialRUsersItem
-                                                      .photoUrl,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.max,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Align(
-                                                          alignment:
-                                                              AlignmentDirectional(
-                                                                  -1, -1),
-                                                          child: Text(
-                                                            initialRUsersItem
-                                                                .displayName,
-                                                            style: FlutterFlowTheme
-                                                                    .of(context)
-                                                                .bodyMedium
-                                                                .override(
-                                                                  fontFamily:
-                                                                      'Inter',
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .accent1,
-                                                                  fontSize: 16,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .normal,
-                                                                  lineHeight: 1,
-                                                                ),
-                                                          ),
-                                                        ),
-                                                        Theme(
-                                                          data: ThemeData(
-                                                            checkboxTheme:
-                                                                CheckboxThemeData(
-                                                              visualDensity:
-                                                                  VisualDensity
-                                                                      .standard,
-                                                              materialTapTargetSize:
-                                                                  MaterialTapTargetSize
-                                                                      .padded,
-                                                              shape:
-                                                                  CircleBorder(),
-                                                            ),
-                                                            unselectedWidgetColor:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .secondaryText,
-                                                          ),
-                                                          child: Checkbox(
-                                                            value: _model
-                                                                    .checkboxValueMap2[
-                                                                initialRUsersItem] ??= true,
-                                                            onChanged:
-                                                                (newValue) async {
-                                                              setState(() =>
-                                                                  _model.checkboxValueMap2[
-                                                                          initialRUsersItem] =
-                                                                      newValue!);
-                                                            },
-                                                            activeColor:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .primary,
-                                                            checkColor:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .info,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    Divider(
-                                                      height: 0,
-                                                      thickness: 1,
-                                                      color:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .lineColor,
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ].divide(SizedBox(width: 15)),
-                                          ),
-                                        );
-                                      }).divide(SizedBox(height: 10)),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -575,7 +382,9 @@ class _ContactTile extends StatelessWidget {
         ),
         title: Text(user.name ?? 'No Name',
             style: FlutterFlowTheme.of(context).bodyText1),
-        subtitle: Text(user.id, style: FlutterFlowTheme.of(context).bodyText2),
+        subtitle: Text(
+            'Last active: ${functions.formatLastActiveTime(user.lastActive!)}',
+            style: FlutterFlowTheme.of(context).bodyText2),
         trailing:
             selected ? Icon(Icons.check_circle, color: Colors.green) : null,
       ),

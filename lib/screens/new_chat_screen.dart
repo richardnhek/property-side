@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dogfooding/auth/firebase_auth/auth_util.dart';
 import 'package:flutter_dogfooding/flutter_flow/flutter_flow_util.dart';
 import 'package:go_router/go_router.dart';
-import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart' as streamFlutter;
 import 'package:webviewx_plus/webviewx_plus.dart';
+import '../backend/backend.dart';
 import '../components/add_group_member/add_group_member_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 
@@ -11,6 +13,8 @@ import '../core/repos/app_preferences.dart';
 import '../core/repos/token_service.dart';
 import '../di/injector.dart';
 import 'channel_screen.dart';
+import 'package:flutter_dogfooding/flutter_flow/custom_functions.dart'
+    as functions;
 import 'new_chat_screen_model.dart';
 export 'new_chat_screen_model.dart';
 
@@ -22,11 +26,12 @@ class ContactsPage extends StatefulWidget {
 }
 
 class _ContactsPageState extends State<ContactsPage> {
-  late final StreamChatClient client;
-  late final StreamUserListController userListController;
+  late final streamFlutter.StreamChatClient client;
+  late final streamFlutter.StreamUserListController userListController;
   late final AppPreferences prefs;
   late final UserCredentials credentials;
   late NewChatModel _model;
+  List<String> _allMembers = [];
 
   @override
   void initState() {
@@ -34,13 +39,44 @@ class _ContactsPageState extends State<ContactsPage> {
     _model = createModel(context, () => NewChatModel());
     prefs = locator.get<AppPreferences>();
     credentials = prefs.userCredentials!;
-    client = StreamChatCore.of(context).client;
-    userListController = StreamUserListController(
-      client: client,
-      limit: 20,
-      filter: Filter.notEqual('id', credentials.userInfo.id),
-    );
-    userListController.doInitialLoad();
+    client = streamFlutter.StreamChatCore.of(context).client;
+    _fetchAllMembers().then((_) {
+      userListController = streamFlutter.StreamUserListController(
+        client: client,
+        filter: streamFlutter.Filter.in_('id', _allMembers),
+      );
+      userListController.doInitialLoad();
+    });
+  }
+
+  Future<void> _fetchAllMembers() async {
+    try {
+      // Reference to the Firestore collection
+      final teamsCollection = FirebaseFirestore.instance.collection('teams');
+
+      // Query the collection to find teams where the all_members field contains the userId
+      QuerySnapshot querySnapshot = await teamsCollection
+          .where('all_members', arrayContains: credentials.userInfo.id)
+          .limit(1) // Limit the query to only one team
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        List<String> members =
+            List<String>.from(querySnapshot.docs.first['all_members']);
+        members.remove(credentials.userInfo.id); // Remove the user's ID
+
+        // Convert list to set to remove duplicates, then back to list
+        Set<String> uniqueMembers = members.toSet();
+
+        setState(() {
+          _allMembers = uniqueMembers.toList();
+        });
+      } else {
+        print('No team found containing the user.');
+      }
+    } catch (e) {
+      print('Error fetching all_members: $e');
+    }
   }
 
   @override
@@ -262,64 +298,71 @@ class _ContactsPageState extends State<ContactsPage> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 20, left: 20.0, right: 20.0),
-                  child: PagedValueListenableBuilder<int, User>(
-                    valueListenable: userListController,
-                    builder: (context, value, child) {
-                      return value.when(
-                        (users, nextPageKey, error) {
-                          if (users.isEmpty) {
-                            return const Center(
-                                child: Text('There are no users'));
-                          }
-                          return LazyLoadScrollView(
-                            onEndOfPage: () async {
-                              if (nextPageKey != null) {
-                                userListController.loadMore(nextPageKey);
-                              }
-                            },
-                            child: Column(
-                              children: [
-                                Container(
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryBackground,
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        blurRadius: 6,
-                                        color: Color(0x14000000),
-                                        offset: Offset(0, 0),
-                                      )
+                  padding: EdgeInsets.only(
+                      top: 20, left: 20.0, right: 20.0, bottom: 20.0),
+                  child: _allMembers.isNotEmpty
+                      ? streamFlutter.PagedValueListenableBuilder<int,
+                          streamFlutter.User>(
+                          valueListenable: userListController,
+                          builder: (context, value, child) {
+                            return value.when(
+                              (users, nextPageKey, error) {
+                                if (users.isEmpty) {
+                                  return const Center(
+                                      child: Text('There are no users'));
+                                }
+                                return streamFlutter.LazyLoadScrollView(
+                                  onEndOfPage: () async {
+                                    if (nextPageKey != null) {
+                                      userListController.loadMore(nextPageKey);
+                                    }
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          color: FlutterFlowTheme.of(context)
+                                              .secondaryBackground,
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              blurRadius: 6,
+                                              color: Color(0x14000000),
+                                              offset: Offset(0, 0),
+                                            )
+                                          ],
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        child: Padding(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  0, 10, 20, 10),
+                                          child: ListView.builder(
+                                            shrinkWrap: true,
+                                            itemCount: users.length,
+                                            physics:
+                                                const NeverScrollableScrollPhysics(),
+                                            itemBuilder: (context, index) {
+                                              final user = users[index];
+                                              return _ContactTile(
+                                                  user:
+                                                      user); // Pass user to tile
+                                            },
+                                          ),
+                                        ),
+                                      ),
                                     ],
-                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                                  child: Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0, 10, 20, 10),
-                                    child: ListView.builder(
-                                      shrinkWrap: true,
-                                      itemCount: users.length,
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      itemBuilder: (context, index) {
-                                        final user = users[index];
-                                        return _ContactTile(
-                                            user: user); // Pass user to tile
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                        loading: () =>
-                            const Center(child: CircularProgressIndicator()),
-                        error: (e) => Text(e.message),
-                      );
-                    },
-                  ),
+                                );
+                              },
+                              loading: () => const Center(
+                                  child: CircularProgressIndicator()),
+                              error: (e) => Text(e.message),
+                            );
+                          },
+                        )
+                      : Text("No members in team"),
                 ),
               ],
             ),
@@ -336,12 +379,12 @@ class _ContactTile extends StatelessWidget {
     required this.user,
   }) : super(key: key);
 
-  final User user;
+  final streamFlutter.User user;
 
   Future<void> createChannel(BuildContext context) async {
     final prefs = locator.get<AppPreferences>();
     final credentials = prefs.userCredentials;
-    final StreamChatClient client = locator.get();
+    final streamFlutter.StreamChatClient client = locator.get();
     final members = [credentials!.userInfo.id, user.id];
     final channel =
         client.channel('messaging', extraData: {'members': members});
@@ -353,7 +396,7 @@ class _ContactTile extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => StreamChannel(
+        builder: (context) => streamFlutter.StreamChannel(
           channel: channel,
           child: ChannelPage(selectedMembers: members.map((m) => m).toList()),
         ),
@@ -376,7 +419,7 @@ class _ContactTile extends StatelessWidget {
           style: FlutterFlowTheme.of(context).bodyText1,
         ),
         subtitle: Text(
-          user.id,
+          'Last active: ${functions.formatLastActiveTime(user.lastActive!)}',
           style: FlutterFlowTheme.of(context).bodyText2,
         ),
       ),

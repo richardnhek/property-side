@@ -1,5 +1,6 @@
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart' as streamFlutter;
 
 import '../../app/user_auth_controller.dart';
 import '../../backend/backend.dart';
@@ -147,6 +148,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final client = streamFlutter.StreamChat.of(context).client;
+    streamFlutter.User? currentChatUser =
+        streamFlutter.StreamChat.of(context).currentUser;
     return GestureDetector(
       onTap: () => _model.unfocusNode.canRequestFocus
           ? FocusScope.of(context).requestFocus(_model.unfocusNode)
@@ -569,6 +573,23 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                                     .isNotEmpty) {
                                                   updateUserProfilePicture();
                                                 }
+                                                await client.updateUser(
+                                                  streamFlutter.User(
+                                                    id: currentChatUser!.id,
+                                                    extraData: {
+                                                      'name': _model
+                                                              .fullNameController
+                                                              ?.text ??
+                                                          '',
+                                                      'image': _model.userProPic
+                                                              .isEmpty
+                                                          ? _model
+                                                              .originalUserProPic
+                                                          : _model.userProPic,
+                                                    },
+                                                  ),
+                                                );
+
                                                 setState(() {
                                                   _model.isChanged = false;
                                                 });

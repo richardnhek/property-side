@@ -55,7 +55,6 @@ class _ChannelListState extends State<ChannelList> {
       client: client,
       filter: filterStream.Filter.in_('members', [currentChatUser!.id]),
       channelStateSort: const [SortOption('last_message_at')],
-      limit: 20,
     );
 
     messageSearchListController.doInitialLoad();
@@ -87,7 +86,6 @@ class _ChannelListState extends State<ChannelList> {
       client: client,
       filter: filter,
       channelStateSort: const [SortOption('last_message_at')],
-      limit: 20,
     );
 
     // Force widget to rebuild with new controller
@@ -297,182 +295,186 @@ class _ChannelListState extends State<ChannelList> {
             backgroundColor: Colors.white,
           ),
           backgroundColor: Colors.white,
-          body: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 10.0, vertical: 20.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(12.0)),
-                      border: Border.all(
-                          color: FlutterFlowTheme.of(context).darkGrey2,
-                          width: 2.0)),
-                  height: 60.0,
-                  child: Center(
-                    child: TextField(
-                      controller: _searchController,
-                      style: GoogleFonts.inter(
-                          fontSize: 14.0,
-                          color: FlutterFlowTheme.of(context).primaryText),
-                      cursorColor: Colors.red,
-                      decoration: const InputDecoration(
-                          hintText: 'Search for chats...',
-                          prefixIcon: Icon(Icons.search),
-                          focusedBorder: InputBorder.none),
-                      onChanged: (value) {
-                        setState(() {
-                          _searchQuery = value;
-                          _updateListController();
-                          messageSearchListController
-                            ..searchQuery = value
-                            ..doInitialLoad();
-                        });
-                      },
+          body: Padding(
+            padding: const EdgeInsets.only(bottom: 20.0),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0, vertical: 20.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(12.0)),
+                        border: Border.all(
+                            color: FlutterFlowTheme.of(context).darkGrey2,
+                            width: 2.0)),
+                    height: 60.0,
+                    child: Center(
+                      child: TextField(
+                        controller: _searchController,
+                        style: GoogleFonts.inter(
+                            fontSize: 14.0,
+                            color: FlutterFlowTheme.of(context).primaryText),
+                        cursorColor: Colors.red,
+                        decoration: const InputDecoration(
+                            hintText: 'Search for chats...',
+                            prefixIcon: Icon(Icons.search),
+                            focusedBorder: InputBorder.none),
+                        onChanged: (value) {
+                          setState(() {
+                            _searchQuery = value;
+                            _updateListController();
+                            messageSearchListController
+                              ..searchQuery = value
+                              ..doInitialLoad();
+                          });
+                        },
+                      ),
                     ),
                   ),
                 ),
-              ),
-              _searchQuery.isNotEmpty
-                  ? Expanded(
-                      child: PagedValueListenableBuilder<String,
-                          GetMessageResponse>(
-                        valueListenable: messageSearchListController,
-                        builder: (context, value, child) {
-                          return value.when(
-                            (responses, nextPageKey, error) =>
-                                LazyLoadScrollView(
-                              onEndOfPage: () async {
-                                if (nextPageKey != null) {
-                                  messageSearchListController
-                                      .loadMore(nextPageKey);
-                                }
-                              },
-                              child: ListView.builder(
-                                itemCount:
-                                    (nextPageKey != null || error != null)
-                                        ? responses.length + 1
-                                        : responses.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  if (index == responses.length) {
-                                    if (error != null) {
-                                      return TextButton(
-                                        onPressed: () {
-                                          messageSearchListController.retry();
-                                        },
-                                        child: Text(error.message),
-                                      );
-                                    }
-                                    return const CircularProgressIndicator();
+                _searchQuery.isNotEmpty
+                    ? Expanded(
+                        child: PagedValueListenableBuilder<String,
+                            GetMessageResponse>(
+                          valueListenable: messageSearchListController,
+                          builder: (context, value, child) {
+                            return value.when(
+                              (responses, nextPageKey, error) =>
+                                  LazyLoadScrollView(
+                                onEndOfPage: () async {
+                                  if (nextPageKey != null) {
+                                    messageSearchListController
+                                        .loadMore(nextPageKey);
                                   }
+                                },
+                                child: ListView.builder(
+                                  itemCount:
+                                      (nextPageKey != null || error != null)
+                                          ? responses.length + 1
+                                          : responses.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    if (index == responses.length) {
+                                      if (error != null) {
+                                        return TextButton(
+                                          onPressed: () {
+                                            messageSearchListController.retry();
+                                          },
+                                          child: Text(error.message),
+                                        );
+                                      }
+                                      return const CircularProgressIndicator();
+                                    }
 
-                                  final item = responses[index];
-                                  final searchedChannel = client.channel(
-                                      'messaging',
-                                      id: item.channel?.id);
-                                  return InkWell(
-                                    onTap: () async {
-                                      final members =
-                                          await getMemberIds(searchedChannel);
-                                      // ignore: use_build_context_synchronously
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => StreamChannel(
-                                            channel: searchedChannel,
-                                            child: ChannelPage(
-                                              selectedMembers: members,
+                                    final item = responses[index];
+                                    final searchedChannel = client.channel(
+                                        'messaging',
+                                        id: item.channel?.id);
+                                    return InkWell(
+                                      onTap: () async {
+                                        final members =
+                                            await getMemberIds(searchedChannel);
+                                        // ignore: use_build_context_synchronously
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => StreamChannel(
+                                              channel: searchedChannel,
+                                              child: ChannelPage(
+                                                selectedMembers: members,
+                                              ),
                                             ),
                                           ),
+                                        );
+                                      },
+                                      child: Container(
+                                        child: StreamChannelListTile(
+                                          channel: searchedChannel,
                                         ),
-                                      );
-                                    },
-                                    child: Container(
-                                      child: StreamChannelListTile(
-                                        channel: searchedChannel,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              loading: () => const Center(
+                                child: SizedBox(
+                                  height: 100,
+                                  width: 100,
+                                  child: CircularProgressIndicator(),
+                                ),
+                              ),
+                              error: (e) => const Center(
+                                child: Text(
+                                  'No results',
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                    : const SizedBox(
+                        width: 0,
+                      ),
+                _searchQuery.isEmpty
+                    ? Expanded(
+                        child: StreamChannelListView(
+                          controller: _listController!,
+                          separatorBuilder:
+                              (context, channelList, channelIndex) {
+                            return Divider(
+                                color: FlutterFlowTheme.of(context).darkGrey3,
+                                indent: 10.0,
+                                endIndent: 10.0,
+                                height: 10);
+                          },
+                          itemBuilder: (context, channels, index,
+                              defaultChannelListTile) {
+                            final channel = channels[index];
+                            return InkWell(
+                              onTap: () async {
+                                if (_isSelectionMode) {
+                                  setState(() {
+                                    if (_selectedChannelIds
+                                        .contains(channel.id)) {
+                                      _selectedChannelIds.remove(channel.id);
+                                    } else {
+                                      _selectedChannelIds.add(channel.id!);
+                                    }
+                                  });
+                                  await updateCanDeleteStatus();
+                                } else {
+                                  final members = await getMemberIds(channel);
+                                  // ignore: use_build_context_synchronously
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => StreamChannel(
+                                        channel: channel,
+                                        child: ChannelPage(
+                                          selectedMembers: members,
+                                        ),
                                       ),
                                     ),
                                   );
-                                },
+                                }
+                              },
+                              child: Container(
+                                color: _selectedChannelIds.contains(channel.id)
+                                    ? Colors.blue[100]
+                                    : null, // Highlight if selected
+                                child: defaultChannelListTile,
                               ),
-                            ),
-                            loading: () => const Center(
-                              child: SizedBox(
-                                height: 100,
-                                width: 100,
-                                child: CircularProgressIndicator(),
-                              ),
-                            ),
-                            error: (e) => Center(
-                              child: Text(
-                                'Oh no, something went wrong. '
-                                'Please check your config. $e',
-                              ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
+                      )
+                    : const SizedBox(
+                        width: 0,
                       ),
-                    )
-                  : const SizedBox(
-                      width: 0,
-                    ),
-              _searchQuery.isEmpty
-                  ? Expanded(
-                      child: StreamChannelListView(
-                        controller: _listController!,
-                        separatorBuilder: (context, channelList, channelIndex) {
-                          return Divider(
-                              color: FlutterFlowTheme.of(context).darkGrey3,
-                              indent: 10.0,
-                              endIndent: 10.0,
-                              height: 10);
-                        },
-                        itemBuilder:
-                            (context, channels, index, defaultChannelListTile) {
-                          final channel = channels[index];
-                          return InkWell(
-                            onTap: () async {
-                              if (_isSelectionMode) {
-                                setState(() {
-                                  if (_selectedChannelIds
-                                      .contains(channel.id)) {
-                                    _selectedChannelIds.remove(channel.id);
-                                  } else {
-                                    _selectedChannelIds.add(channel.id!);
-                                  }
-                                });
-                                await updateCanDeleteStatus();
-                              } else {
-                                final members = await getMemberIds(channel);
-                                // ignore: use_build_context_synchronously
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => StreamChannel(
-                                      channel: channel,
-                                      child: ChannelPage(
-                                        selectedMembers: members,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }
-                            },
-                            child: Container(
-                              color: _selectedChannelIds.contains(channel.id)
-                                  ? Colors.blue[100]
-                                  : null, // Highlight if selected
-                              child: defaultChannelListTile,
-                            ),
-                          );
-                        },
-                      ),
-                    )
-                  : const SizedBox(
-                      width: 0,
-                    ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

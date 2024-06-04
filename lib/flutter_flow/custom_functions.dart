@@ -148,3 +148,22 @@ Future<UsersRecord?> fetchUserRecord() async {
     return null;
   }
 }
+
+String formatLastActiveTime(DateTime lastActive) {
+  final now = DateTime.now();
+  final difference = now.difference(lastActive);
+
+  if (difference.inDays > 0) {
+    // More than a day ago
+    return DateFormat('dd/MM/yyyy').format(lastActive);
+  } else {
+    // Within the same day
+    if (difference.inHours > 0) {
+      return '${difference.inHours}h ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}m ago';
+    } else {
+      return 'Active now';
+    }
+  }
+}

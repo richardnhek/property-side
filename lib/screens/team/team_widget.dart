@@ -198,7 +198,7 @@ class _TeamWidgetState extends State<TeamWidget> {
               Padding(
                 padding: EdgeInsetsDirectional.fromSTEB(20, 16, 20, 0),
                 child: Text(
-                  'Engaging with the Mortgage app team: your path to seamless home financing.',
+                  'Engaging with your PropertySide team: your path to seamless home financing.',
                   style: FlutterFlowTheme.of(context).bodyMedium.override(
                         fontFamily: 'Inter',
                         color: FlutterFlowTheme.of(context).darkGrey,
@@ -221,7 +221,7 @@ class _TeamWidgetState extends State<TeamWidget> {
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(0, 0, 5, 0),
                         child: Text(
-                          'Your Personal Team',
+                          'Your Team',
                           textAlign: TextAlign.start,
                           style:
                               FlutterFlowTheme.of(context).bodyMedium.override(
@@ -232,16 +232,6 @@ class _TeamWidgetState extends State<TeamWidget> {
                                   ),
                         ),
                       ),
-                      // Text(
-                      //   '(2)',
-                      //   textAlign: TextAlign.start,
-                      //   style: FlutterFlowTheme.of(context).bodyMedium.override(
-                      //         fontFamily: 'Inter',
-                      //         fontSize: 14,
-                      //         fontWeight: FontWeight.w500,
-                      //         lineHeight: 1.5,
-                      //       ),
-                      // ),
                     ],
                   ),
                 ),
@@ -267,11 +257,14 @@ class _TeamWidgetState extends State<TeamWidget> {
                           return SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: personalTeamMembers
                                   .map((userDetails) {
                                     return Container(
                                       constraints: BoxConstraints(maxWidth: 70),
                                       child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           ClipRRect(
                                             borderRadius:
@@ -305,210 +298,6 @@ class _TeamWidgetState extends State<TeamWidget> {
                         },
                       ),
                     ),
-                  ].divide(SizedBox(width: 15)),
-                ),
-              ),
-              Divider(
-                height: 40,
-                thickness: 1,
-                color: FlutterFlowTheme.of(context).darkGrey3,
-              ),
-              Align(
-                alignment: AlignmentDirectional(-1, -1),
-                child: Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(20, 0, 0, 0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 0, 5, 0),
-                        child: Text(
-                          'Your Finance Team',
-                          textAlign: TextAlign.start,
-                          style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    fontFamily: 'Inter',
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    lineHeight: 1.5,
-                                  ),
-                        ),
-                      ),
-                      // Text(
-                      //   '(4)',
-                      //   textAlign: TextAlign.start,
-                      //   style: FlutterFlowTheme.of(context).bodyMedium.override(
-                      //         fontFamily: 'Inter',
-                      //         fontSize: 14,
-                      //         fontWeight: FontWeight.w500,
-                      //         lineHeight: 1.5,
-                      //       ),
-                      // ),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(20, 16, 20, 0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Align(
-                      alignment: AlignmentDirectional(-1, -1),
-                      child: StreamBuilder<List<Map<String, dynamic>>>(
-                        stream:
-                            fetchSubteamUserDetails(currentUserId!, "FINANCE"),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return CircularProgressIndicator(
-                                color: FlutterFlowTheme.of(context).primary);
-                          }
-                          List<Map<String, dynamic>> personalTeamMembers =
-                              snapshot.data!;
-                          return SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: personalTeamMembers
-                                  .map((userDetails) {
-                                    return Container(
-                                      constraints: BoxConstraints(maxWidth: 70),
-                                      child: Column(
-                                        children: [
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                            child: Image.network(
-                                              userDetails[
-                                                  'photo_url'], // Assuming 'photo_url' is the field for the user's photo
-                                              width: 65,
-                                              height: 65,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.only(top: 10),
-                                            child: Text(
-                                              userDetails[
-                                                  'display_name'], // Assuming 'display_name' is the field for the user's name
-                                              style:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyText1,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  })
-                                  .toList()
-                                  .divide(SizedBox(width: 15)),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ].divide(SizedBox(width: 15)),
-                ),
-              ),
-              Divider(
-                height: 40,
-                thickness: 1,
-                color: FlutterFlowTheme.of(context).darkGrey3,
-              ),
-              Align(
-                alignment: AlignmentDirectional(-1, -1),
-                child: Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(20, 0, 0, 0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 0, 5, 0),
-                        child: Text(
-                          'Your Buying Team',
-                          textAlign: TextAlign.start,
-                          style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    fontFamily: 'Inter',
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    lineHeight: 1.5,
-                                  ),
-                        ),
-                      ),
-                      // Text(
-                      //   '(4)',
-                      //   textAlign: TextAlign.start,
-                      //   style: FlutterFlowTheme.of(context).bodyMedium.override(
-                      //         fontFamily: 'Inter',
-                      //         fontSize: 14,
-                      //         fontWeight: FontWeight.w500,
-                      //         lineHeight: 1.5,
-                      //       ),
-                      // ),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(20, 16, 20, 0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Align(
-                        alignment: AlignmentDirectional(-1, -1),
-                        child: StreamBuilder<List<Map<String, dynamic>>>(
-                          stream:
-                              fetchSubteamUserDetails(currentUserId!, "BUYING"),
-                          builder: (context, snapshot) {
-                            if (!snapshot.hasData) {
-                              return CircularProgressIndicator(
-                                  color: FlutterFlowTheme.of(context).primary);
-                            }
-                            List<Map<String, dynamic>> personalTeamMembers =
-                                snapshot.data!;
-                            return SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: personalTeamMembers
-                                    .map((userDetails) {
-                                      return Container(
-                                        constraints:
-                                            BoxConstraints(maxWidth: 70),
-                                        child: Column(
-                                          children: [
-                                            ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                              child: Image.network(
-                                                userDetails[
-                                                    'photo_url'], // Assuming 'photo_url' is the field for the user's photo
-                                                width: 65,
-                                                height: 65,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.only(top: 10),
-                                              child: Text(
-                                                userDetails[
-                                                    'display_name'], // Assuming 'display_name' is the field for the user's name
-                                                style:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyText1,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    })
-                                    .toList()
-                                    .divide(SizedBox(width: 15)),
-                              ),
-                            );
-                          },
-                        )),
                   ].divide(SizedBox(width: 15)),
                 ),
               ),
